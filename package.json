@@ -1,0 +1,31 @@
+{
+  "name": "language-powerbasic",
+  "version": "0.0.1",
+  "description": "PowerBASIC Language Support for Atom",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/machuu/language-powerbasic.git",
+    "ssh": "git@github.com:machuu/language-powerbasic.git"
+  },
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {},
+  "readme": "# lang-powerbasic package\n\npowerbasic Language support for Atom\n\nGet powerbasic at http://powerbasic.net/get\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "hhttps://github.com/machuu/language-powerbasic/issue"
+  },
+  "homepage": "https://github.com/machuu/language-powerbasic#readme",
+  "_id": "language-powerbasic@0.0.1",
+  "_atomModuleCache": {
+    "version": 1,
+    "dependencies": [],
+    "extensions": {
+      ".json": [
+        "package.json"
+      ]
+    },
+    "folders": []
+  }
+}
