@@ -619,94 +619,86 @@
             ]
         },
         "expression": {
-            "comment": "statement which performs an assignment or comparison",
-            "patterns": [
-                {
-                    "comment": "consume nested expressions inside parentheses",
-                    "name": "expression.enclosed.parens",
-                    "begin": "[\\s\\(](\\()",
-                    "beginCaptures": {
-                        "1": {
-                            "patterns": [
-                                {
-                                    "include": "#expression_punctuation"
-                                }
-                            ]
-                        }
-                    },
-                    "end": "[^\\(](\\))",
-                    "endCaptures": {
-                        "1": {
-                            "patterns": [
-                                {
-                                    "include": "#expression_punctuation"
-                                }
-                            ]
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#expression"
-                        },
-                        {
-                            "include": "#expression_statement"
-                        }
-                    ]
-                },
-                {
-                    "include": "#expression_statement"
+            "comment": "consume nested expressions inside parentheses",
+            "name": "meta.expression.enclosed.parens",
+            "begin": "(\\()",
+            "beginCaptures": {
+                "1": {
+					"name": "punctuation.open.parens.expression.powerbasic"
                 }
+            },
+            "end": "(\\))",
+            "endCaptures": {
+				"1": {
+					"name": "punctuation.close.parens.expression.powerbasic"
+				}
+            },
+            "patterns": [
+				{
+					"include": "#expression"
+				},
+				{
+					"include": "#quoted_string"
+				},
+				{
+					"include": "#process_call"
+				},
+				{
+					"include": "#variable"
+				},
+				{
+					"include": "#operators"
+				},
+				{
+					"include": "#numbers"
+				}
             ]
         },
         "expression_statement": {
-            "patterns": [
-                {
-                    "comment": "match expressions on either side of operator",
-                    "name": "meta.expression.powerbasic",
-                    "match": "\\s*(.*\\s)(=)(\\s.*)",
-                    "captures": {
-                        "1": {
-                            "patterns": [
-                                {
-                                    "include": "#process_call"
-                                },
-                                {
-                                    "include": "#variable"
-                                },
-                                {
-                                    "include": "#numbers"
-                                },
-                                {
-                                    "include": "#quoted_string"
-                                }
-                            ]
+            "comment": "match expressions on either side of operator",
+            "name": "meta.expression.statement.powerbasic",
+            "match": "\\s*(.*\\s)(=|>|<)(\\s.*)(?=\\)\\s|\\)\\)|\\)|)",
+            "captures": {
+                "1": {
+                    "patterns": [
+                        {
+                            "include": "#process_call"
                         },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "include": "#operators"
-                                }
-                            ]
+                        {
+                            "include": "#variable"
                         },
-                        "3": {
-                            "patterns": [
-                                {
-                                    "include": "#process_call"
-                                },
-                                {
-                                    "include": "#variable"
-                                },
-                                {
-                                    "include": "#numbers"
-                                },
-                                {
-                                    "include": "#quoted_string"
-                                }
-                            ]
+                        {
+                            "include": "#numbers"
+                        },
+                        {
+                            "include": "#quoted_string"
                         }
-                    }
+                    ]
+                },
+                "2": {
+                    "patterns": [
+                        {
+                            "include": "#operators"
+                        }
+                    ]
+                },
+                "3": {
+                    "patterns": [
+                        {
+                            "include": "#process_call"
+                        },
+                        {
+                            "include": "#variable"
+                        },
+                        {
+                            "include": "#numbers"
+                        },
+                        {
+                            "include": "#quoted_string"
+                        }
+                    ]
                 }
-            ]
+            }
         },
         "expression_numeric": {
             "comment": "statement which performs an assignment or comparison with only numeric values",
@@ -765,7 +757,7 @@
         },
         "if_block": {
             "comment": "test if_block",
-            "begin": "^\\s*((IF))\\b(\\s+.*\\s+)\\b(THEN)(\\s+\\'.*)?",
+            "begin": "\\s*\\b((IF))\\s*(\\s.+\\s)\\s*(THEN)(\\s+\\'.*)?",
             "beginCaptures": {
                 "1": {
                     "name": "meta.keyword.control.ifblock.powerbasic"
@@ -1063,8 +1055,27 @@
             },
             "patterns": [
                 {
-                    "include": "#process_arguments"
-                }
+					"name": "support.modifier.argument.process.powerbasic",
+					"match": "BY[A-Z]{3}"
+				},
+				{
+					"include": "#quoted_string"
+				},
+				{
+					"include": "#process_call"
+				},
+				{
+					"include": "#variable"
+				},
+				{
+					"include": "#variable_type_specifier"
+				},
+				{
+					"include": "#numbers"
+				},
+				{
+					"include": "#process_punctuation"
+				}
             ]
         },
         "process_declaration": {
@@ -1197,15 +1208,15 @@
         "process_punctuation": {
             "patterns": [
                 {
-                    "name": "punctuation.process.arguments.begin.powerbasic",
+                    "name": "punctuation.begin.arguments.process.powerbasic",
                     "match": "\\("
                 },
+				{
+					"name": "punctuation.separator.arguments.process.powerbasic",
+					"match": ","
+				},
                 {
-                    "name": "punctuation.process.arguments.separator.powerbasic",
-                    "match": ","
-                },
-                {
-                    "name": "punctuation.process.arguments.end.powerbasic",
+                    "name": "punctuation.end.arguments.process.powerbasic",
                     "match": "\\)"
                 }
             ]
@@ -1344,20 +1355,16 @@
             ]
         },
         "variable_type_specifier": {
-            "match": "(AS)\\s+(\\S+)",
+            "match": "(AS)\\s+([A-Z]+)",
             "captures": {
                 "1": {
-                    "name": "keyword.identifier.type.variable.powerbasic"
+                    "name": "support.identifier.type.variable.powerbasic"
                 },
                 "2": {
                     "patterns": [
                         {
                             "name": "support.variable.type.specifier",
                             "match": "(PTR|POINTER|INTEGER|LONG|QUAD|BYTE|WORD|DWORD|SINGLE|DOUBLE|EXT|EXTENDED|CUR|CURRENCY|CUX|CURRENCYX|STRING|ASCIIZ|STRINGZ|FIELD|WSTRING|WSTRINGZ|WFIELD|VARIANT|GUID|IAUTOMATION|IDISPATCH|IUNKNOWN)\\b"
-                        },
-                        {
-                            "name": "invalid.illegal.support.variable.type.specifier",
-                            "match": "(?!(PTR|POINTER|INTEGER|LONG|QUAD|BYTE|WORD|DWORD|SINGLE|DOUBLE|EXT|EXTENDED|CUR|CURRENCY|CUX|CURRENCYX|STRING|ASCIIZ|STRINGZ|FIELD|WSTRING|WSTRINGZ|WFIELD|VARIANT|GUID|IAUTOMATION|IDISPATCH|IUNKNOWN))"
                         }
                     ]
                 }
