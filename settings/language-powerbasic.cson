@@ -1,3 +1,7 @@
 '.source.powerbasic':
   'editor':
     'commentStart': '\''
+	'softTabs': false
+	'tabLength': 4
+	'increaseIndentPattern': '^\\s*(FUNCTION|SUB|IF|WHILE|DO|FOR)'
+	'decreaseIndentPattern': '^\\s*(ELSEIF|END|LOOP|NEXT)'
