@@ -1092,7 +1092,7 @@
 		},
         "process_alias": {
             "name": "meta.function.declaration.alias.powerbasic",
-            "match": "(ALIAS)\\s+(\"\\w*\")\\s",
+            "match": "(ALIAS)\\s+(\"\\w*\")",
             "captures": {
                 "1": {
                     "name": "keyword.control.powerbasic"
@@ -1108,7 +1108,7 @@
             }
         },
         "process_arguments": {
-            "name": "meta.process.arguments",
+            "name": "meta.arguments.process.powerbasic",
             "patterns": [
                 {
                     "name": "support.modifier.argument.process.powerbasic",
@@ -1262,11 +1262,27 @@
 							"name": "keyword.control.exit.powerbasic"
 						},
 						"2": {
-							"name": "support.structure.exit.powerbasic",
+							"name": "keyword.structure.exit.powerbasic",
 							"match": "(DO|FASTPROC|FOR|FUNCTION|IF|LOOP|MACRO|METHOD|PROPERTY|SELECT|SUB|TRY|ITERATE)"
 						}
 					}
 				},
+                {
+                    "name": "keyword.control.environ.powerbasic",
+                    "match": "\\b(FILEATTR)\\b"
+                },
+                {
+                    "name": "keyword.control.environ.powerbasic",
+                    "match": "\\b(FILECOPY)\\b"
+                },
+                {
+                    "name": "keyword.control.environ.powerbasic",
+                    "match": "\\b(FILENAME\\$)"
+                },
+                {
+                    "name": "keyword.control.environ.powerbasic",
+                    "match": "\\b(FILESCAN)\\b"
+                },
 				{
 					"comment": "File Close",
 					"match": "\\b(CLOSE)\\b(?:\\s+(#.*))?",
@@ -1275,44 +1291,136 @@
 							"name": "keyword.control.close.powerbasic"
 						},
 						"2": {
-							"name": "support.file_number.powerbasic"
+							"name": "support.file_number.powerbasic",
+							"patterns": [
+								{
+									"include": "#expression"
+								}
+							]
 						}
 					}
 				},
 				{
 					"comment": "File Open",
-					"match": "\\b(OPEN)(?:\\s+(#.*),?)?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
+					"match": "\\b(OPEN HANDLE|OPEN)((?:\\s+(?!FOR|ACCESS|LOCK|AS)\\S+)+)?((?:\\s+(?:(?:FOR|ACCESS|LOCK|AS|LEN|BASE|CHR)(?:\\s+(?!FOR|ACCESS|LOCK|AS|LEN|BASE|CHR)[^\\s\\']+)*))*)?(?:\\s+(\\'.*))?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.open.powerbasic"
 						},
 						"2": {
-							"name": "support.file_number.powerbasic"
-						},
-						"3": {
+							"name": "meta.file.open.powerbasic",
 							"patterns": [
 								{
 									"include": "#expression"
-								},
+								}
+							]
+						},
+						"3": {
+							"name": "meta.options.open.powerbasic",
+							"patterns": [
 								{
-									"name": "support.whitespace.print.powerbasic",
-									"begin": "(TAB|SPC)\\(",
-									"end": "\\)",
-									"patterns": [
-										{
-											"include": "#variable"
+									"match": "\\b(FOR)(?:\\s+(INPUT|OUTPUT|APPEND|BINARY|RANDOM))?",
+									"captures": {
+										"1": {
+											"name": "keyword.for.open.powerbasic"
 										},
-										{
-											"include": "#process_call"
-										},
-										{
-											"include": "#numbers"
+										"2": {
+											"name": "support.mode.for.open.powerbasic"
 										}
-									]
+									}
 								},
 								{
-									"name": "punctuation.separator.expression.print.powerbasic",
-									"match": "(,|;)"
+									"match": "\\b(ACCESS)(?:\\s+(READ WRITE|READ|WRITE))?",
+									"captures": {
+										"1": {
+											"name": "keyword.access.open.powerbasic"
+										},
+										"2": {
+											"name": "support.mode.access.open.powerbasic"
+										}
+									}
+								},
+								{
+									"match": "\\b(LOCK)(?:\\s+(READ WRITE|READ|WRITE|SHARED))?",
+									"captures": {
+										"1": {
+											"name": "keyword.lock.open.powerbasic"
+										},
+										"2": {
+											"name": "support.mode.lock.open.powerbasic"
+										}
+									}
+								},
+								{
+									"match": "\\b(AS)(?:\\s+(#[^\\']+))?",
+									"captures": {
+										"1": {
+											"name": "keyword.as.open.powerbasic"
+										},
+										"2": {
+											"name": "support.file_number.powerbasic",
+											"patterns": [
+												{
+													"include": "#expression"
+												}
+											]
+										}
+									}
+								},
+								{
+									"match": "\\b(LEN)(?:\\s+(=))?(?:\\s+(\\d+))?",
+									"captures": {
+										"1": {
+											"name": "keyword.len.open.powerbasic"
+										},
+										"2": {
+											"name": "keyword.assignment.option.open.powerbasic"
+										},
+										"3": {
+											"name": "support.mode.len.open.powerbasic",
+											"patterns": [
+												{
+													"include": "#numbers"
+												}
+											]
+										}
+									}
+								},
+								{
+									"match": "\\b(BASE)(?:\\s+(=))?(?:\\s+(0|1))?",
+									"captures": {
+										"1": {
+											"name": "keyword.base.open.powerbasic"
+										},
+										"2": {
+											"name": "keyword.assignment.option.open.powerbasic"
+										},
+										"3": {
+											"name": "support.mode.base.open.powerbasic","patterns": [
+												{
+													"include": "#numbers"
+												}
+											]
+										}
+									}
+								},
+								{
+									"match": "\\b(CHR)(?:\\s+(ANSI|WIDE))?",
+									"captures": {
+										"1": {
+											"name": "keyword.chr.open.powerbasic"
+										},
+										"2": {
+											"name": "support.mode.chr.open.powerbasic"
+										}
+									}
+								}
+							]
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#comment_line"
 								}
 							]
 						}
@@ -1326,7 +1434,12 @@
 							"name": "keyword.control.print.powerbasic"
 						},
 						"2": {
-							"name": "support.file_number.powerbasic"
+							"name": "support.file_number.powerbasic",
+							"patterns": [
+								{
+									"include": "#expression"
+								}
+							]
 						},
 						"3": {
 							"patterns": [
@@ -1357,6 +1470,22 @@
 						}
 					}
 				},
+                {
+                    "name": "keyword.freefile.powerbasic",
+                    "match": "\\bFREEFILE\\b"
+                },
+                {
+                    "name": "keyword.isfile.powerbasic",
+                    "match": "\\bISFILE\\b"
+                },
+                {
+                    "name": "keyword.kill.powerbasic",
+                    "match": "\\bKILL\\b"
+                },
+                {
+                    "name": "keyword.shell.powerbasic",
+                    "match": "\\bSHELL\\b"
+                },
 				{
 					"match": "\\b(UCODEPAGE)((?:\\s+(?!TO)\\S+)+)?(?:\\s+(TO))?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
 					"captures": {
@@ -1403,7 +1532,7 @@
 			"patterns": [
 				{
 					"name": "meta.call.without_arguments.process.powerbasic",
-					"match": "\\b([A-Z]\\w*[%&!\\?\\$]*)[\\s\\),;]",
+					"match": "(\\b[A-Z]\\w*[%&!\\?\\$]*)[\\s\\),;]",
 					"captures": {
 						"1": {
 							"patterns": [
@@ -1416,7 +1545,7 @@
 				},
 				{
 		            "name": "meta.call.with_arguments.process.powerbasic",
-		            "begin": "\\b([A-Z]\\w*[%&!\\?\\$]*)(\\()",
+		            "begin": "(\\b[A-Z]\\w*[%&!\\?\\$]*)(\\()",
 		            "beginCaptures": {
 		                "1": {
 		                    "patterns": [
@@ -1491,7 +1620,7 @@
             ]
         },
         "process_declaration_function": {
-            "begin": "^\\s*(FUNCTION)(?:\\s+(\\S+))(?:\\s(ALIAS\\s+\\S+)\\s)?(?:\\s*(\\(.*\\)))(?:\\s+(?!AS)(\\S+))?(?:\\s+(AS\\s+\\S+))?",
+            "begin": "^\\s*(FUNCTION)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\(.*\\)))?(?:\\s+(?!AS)(\\S+))?(?:\\s+(AS\\s+\\S+))?",
             "beginCaptures": {
                 "1": {
                     "name": "keyword.control.function.declare.powerbasic"
@@ -1545,7 +1674,7 @@
             ]
         },
         "process_declaration_sub": {
-            "begin": "^\\s*(SUB)(?:\\s+(\\S+)\\s?)(?:\\s(ALIAS\\s+\\S+)\\s)?(\\(.*\\))?",
+            "begin": "^\\s*(SUB)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\(.*\\)))?(?:\\s+(?!AS)(\\S+))?",
             "beginCaptures": {
                 "1": {
                     "name": "keyword.control.sub.declare.powerbasic"
@@ -1684,7 +1813,6 @@
         "variable": {
             "patterns": [
                 {
-                    "name": "meta.variable.array.powerbasic",
                     "begin": "\\b([a-z]\\w*[%&!\\?\\$]*)(\\()",
                     "beginCaptures": {
                         "1": {
@@ -1728,7 +1856,6 @@
                     ]
                 },
                 {
-                    "name": "meta.variable.powerbasic",
                     "match": "\\b([a-z]\\w*[%&!\\?\\$]*)(?:\\s+(AS\\s+\\S+))?",
                     "captures": {
                         "1": {
