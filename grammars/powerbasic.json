@@ -1,7 +1,9 @@
 {
     "scopeName": "source.powerbasic",
     "fileTypes": [
-        "bas"
+        "bas",
+		"bi",
+		"inc"
     ],
     "firstLineMatch": "-[*]-( Mode:)? PowerBASIC -[*]-",
     "name":"PowerBASIC",
@@ -60,7 +62,7 @@
 		},
         "comment_line": {
             "name": "comment.line.powerbasic",
-            "begin": "(^|\\s+)\\'",
+            "begin": "(^\\s*|\\s+)\\'",
             "beginCaptures": {
                 "0": {
                     "name": "punctuation.definition.comment.powerbasic"
@@ -655,7 +657,7 @@
                             "name": "punctuation.open.parens.expression.powerbasic"
                         }
                     },
-                    "end": "(\\))",
+                    "end": "(\\)|(?<!_)\\n)",
                     "endCaptures": {
                         "1": {
                             "name": "punctuation.close.parens.expression.powerbasic"
@@ -817,7 +819,7 @@
 		},
 		"flow_control_for_loop": {
 			"comment": "for loop",
-			"begin": "^\\s*(FOR)(?:\\s+(\\S+))?\\s*(=)?(?:\\s+(\\S+\\(.*\\)|(?!TO)\\S+)\\s+)?(TO)?(?:\\s+(\\S+\\(.*\\)|\\S+)\\s+)?(?:\\s+(STEP)\\s+(.*))?",
+			"begin": "^\\s*(FOR)(?:\\s+(\\S+))?\\s*(=)?((?:\\s+(?!TO)[^\\s\\']+)+)?(TO)?((?:\\s+(?!STEP)[^\\s\\']+)+)?(?:\\s+(STEP)(?:\\s+[^\\s\\']+)+)?",
 			"beginCaptures": {
 				"1": {
 					"comment": "Begin FOR LOOP",
@@ -839,13 +841,7 @@
 					"comment": "Start of FOR LOOP range",
 					"patterns": [
 						{
-							"include": "#process_call"
-						},
-						{
-							"include": "#variable"
-						},
-						{
-							"include": "#numbers"
+							"include": "#expression"
 						}
 					]
 				},
@@ -856,13 +852,7 @@
 					"comment": "End of FOR LOOP range",
 					"patterns": [
 						{
-							"include": "#process_call"
-						},
-						{
-							"include": "#variable"
-						},
-						{
-							"include": "#numbers"
+							"include": "#expression"
 						}
 					]
 				},
@@ -872,10 +862,7 @@
 				"8": {
 					"patterns": [
 						{
-							"include": "#variable"
-						},
-						{
-							"include": "#numbers"
+							"include": "#expression"
 						}
 					]
 				}
@@ -901,7 +888,7 @@
 		},
         "flow_control_if_block": {
             "comment": "multi-line if statement",
-            "begin": "\\b((IF))\\s*(?:\\s+(.+)\\s+)?(\\bTHEN\\b)(\\s\\'.*)?",
+            "begin": "^\\s*\\b((IF))(?:\\s+(.+)\\s+)?(\\bTHEN\\b)(\\s\\'.*)?",
             "beginCaptures": {
                 "1": {
                     "name": "meta.keyword.control.ifblock.powerbasic"
@@ -1124,6 +1111,9 @@
 					"include": "#numbers"
                 },
                 {
+					"include": "#process_built-ins"
+                },
+                {
 					"include": "#process_call"
                 }
             ]
@@ -1132,86 +1122,45 @@
 			"comment": "PowerBASIC built-in functions. Some have odd syntax (arguments w/o parentheses, arguments not comma-separated)",
 			"patterns": [
 				{
-					"comment": "variable declaration",
-					"match": "^\\s*(LOCAL|STATIC|INSTANCE|THREADED|GLOBAL)((?:\\s+[^\\s\\']+)+)(?:\\s+(\\'.*))?",
-					"captures": {
-						"1": {
-							"name": "keyword.control.declaration.variable.powerbasic"
-						},
-						"2": {
-							"patterns": [
-								{
-									"include": "#variable"
-								}
-							]
-						},
-						"3": {
-							"patterns": [
-								{
-									"include": "#comment_line"
-								}
-							]
-						}
-					}
+					"comment": "string equates",
+					"name": "support.equate.string.powerbasic",
+					"match": "(?<=[\\s\\(,])(\\${1,2}[A-Za-z]+)"
 				},
 				{
-					"comment": "variable dimension",
-					"match": "^\\s*(DIM)((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
-					"captures": {
-						"1": {
-							"name": "keyword.control.dimension.variable.powerbasic"
-						},
-						"2": {
-							"patterns": [
-								{
-									"include": "#variable"
-								}
-							]
-						},
-						"3": {
-							"patterns": [
-								{
-									"include": "#comment_line"
-								}
-							]
-						}
-					}
+					"comment": "clear screen",
+					"name": "keyword.control.clear_screen.powerbasic",
+					"match": "\\b(CLS)\\b"
 				},
-						{
-							"comment": "clear screen",
-							"name": "keyword.control.clear_screen.powerbasic",
-							"match": "\\b(CLS)\\b"
-						},
-						{
-							"comment": "console caption",
-							"name": "keyword.control.console_caption.powerbasic",
-							"match": "\\b(CONSNAME\\$)\\b"
-						},
-						{
-							"comment": "console color",
-							"name": "keyword.control.console_caption.powerbasic",
-							"match": "\\b(COLOR)\\b"
-						},
-						{
-							"comment": "get cursor position",
-							"name": "keyword.control.get_cursor_pos.powerbasic",
-							"match": "\\b(CURSOR[XY]?)\\b"
-						},
-						{
-							"comment": "cursor size",
-							"name": "keyword.control.cursor_size.powerbasic",
-							"match": "\\b(CURSOR)\\b"
-						},
-						{
-							"comment": "clear screen",
-							"name": "keyword.control.clear_screen.powerbasic",
-							"match": "\\b(CLS)\\b"
-						},
-						{
-							"comment": "set cursor",
-							"name": "keyword.control.set_cursor_pos.powerbasic",
-							"match": "\\b(LOCATE)\\b"
-						},
+				{
+					"comment": "console caption",
+					"name": "keyword.control.console_caption.powerbasic",
+					"match": "\\b(CONSNAME\\$)\\b"
+				},
+				{
+					"comment": "console color",
+					"name": "keyword.control.console_caption.powerbasic",
+					"match": "\\b(COLOR)\\b"
+				},
+				{
+					"comment": "get cursor position",
+					"name": "keyword.control.get_cursor_pos.powerbasic",
+					"match": "\\b(CURSOR[XY]?)\\b"
+				},
+				{
+					"comment": "cursor size",
+					"name": "keyword.control.cursor_size.powerbasic",
+					"match": "\\b(CURSOR)\\b"
+				},
+				{
+					"comment": "clear screen",
+					"name": "keyword.control.clear_screen.powerbasic",
+					"match": "\\b(CLS)\\b"
+				},
+				{
+					"comment": "set cursor",
+					"name": "keyword.control.set_cursor_pos.powerbasic",
+					"match": "\\b(LOCATE)\\b"
+				},
 				{
 					"comment": "console pseudo-object, standard syntax",
 					"match": "\\s*\\b(CONSOLE|CON)\\b([\\.A-Z]+[%&!\\?\\$]?(?:\\(.*\\))?)(?:\\s+(TO))?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
@@ -1428,7 +1377,7 @@
 				},
 				{
 					"comment": "File read/write operations",
-					"match": "^\\s*(PRINT|WRITE|LINE INPUT|INPUT)(?:\\s+(#.*),)?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
+					"match": "\\s*(PRINT|WRITE|LINE INPUT|INPUT)(?:\\s+(#.*),)?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.print.powerbasic"
@@ -1483,6 +1432,10 @@
                     "match": "\\bKILL\\b"
                 },
                 {
+                    "name": "keyword.parse.powerbasic",
+                    "match": "\\bPARSE\\b"
+                },
+                {
                     "name": "keyword.shell.powerbasic",
                     "match": "\\bSHELL\\b"
                 },
@@ -1531,10 +1484,10 @@
 		"process_call": {
 			"patterns": [
 				{
-					"name": "meta.call.without_arguments.process.powerbasic",
-					"match": "(\\b[A-Z]\\w*[%&!\\?\\$]*)[\\s\\),;]",
+					"match": "(?<=[\\s\\(,;=])(\\b[A-Z]\\w*\\b[%&!\\?\\$]*)(?=[^\\(])",
 					"captures": {
 						"1": {
+							"name": "meta.call.without_arguments.process.powerbasic",
 							"patterns": [
 								{
 									"include": "#process_names"
@@ -1545,7 +1498,7 @@
 				},
 				{
 		            "name": "meta.call.with_arguments.process.powerbasic",
-		            "begin": "(\\b[A-Z]\\w*[%&!\\?\\$]*)(\\()",
+		            "begin": "(\\b[A-Z]\\w*\\b[%&!\\?\\$]*)(\\()",
 		            "beginCaptures": {
 		                "1": {
 		                    "patterns": [
@@ -1590,6 +1543,9 @@
                 },
                 {
                     "include": "#flow_control"
+                },
+                {
+                    "include": "#variable_declaration"
                 },
                 {
                     "include": "#expression"
@@ -1895,6 +1851,56 @@
                 }
             ]
         },
+		"variable_declaration": {
+			"patterns": [
+				{
+					"comment": "variable declaration",
+					"match": "^\\s*(LOCAL|STATIC|INSTANCE|THREADED|GLOBAL)((?:\\s+[^\\s\\']+)+)(?:\\s+(\\'.*))?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.declaration.variable.powerbasic"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#variable"
+								}
+							]
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "#comment_line"
+								}
+							]
+						}
+					}
+				},
+				{
+					"comment": "variable dimension",
+					"match": "^\\s*(DIM)((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.dimension.variable.powerbasic"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#variable"
+								}
+							]
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "#comment_line"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
         "variable_punctuation": {
             "patterns": [
                 {
