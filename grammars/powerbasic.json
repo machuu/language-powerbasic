@@ -770,6 +770,9 @@
 					"include": "#flow_control_for_loop"
                 },
                 {
+					"include": "#flow_control_select"
+                },
+                {
 					"include": "#flow_control_try_block"
                 },
                 {
@@ -1033,6 +1036,72 @@
                 }
             ]
         },
+		"flow_control_select": {
+			"begin": "^\\s*(SELECT)\\b(?:\\s+(CASE)\\b)?(?:\\s+(AS\\s+[A-Z]+))?((?:\\s+[^\\s\\']+)+)?",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.begin.select.powerbasic"
+				},
+				"2": {
+					"name": "keyword.control.case.select.powerbasic"
+				},
+				"3": {
+					"patterns": [
+						{
+							"include": "#variable_type_specifier"
+						}
+					]
+				},
+				"4": {
+					"patterns": [
+						{
+							"include": "#expression"
+						}
+					]
+				}
+			},
+			"end": "^\\s*(END SELECT)\\b",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.end.select.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"match": "^\\s*(CASE)\\b(?:\\s+(IS))?((?:\\s+[^\\s\\']+)+)?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.case.select.powerbasic"
+						},
+						"2": {
+							"name": "keyword.control.is.case.control.powerbasic"
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "#expression"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "keyword.control.finally.try.powerbasic",
+					"match": "^\\s*(CASE)\\b(?:\\s+(ELSE))?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.case.select.powerbasic"
+						},
+						"2": {
+							"name": "keyword.control.else.case.control.powerbasic"
+						}
+					}
+				},
+				{
+					"include": "#process_contents"
+				}
+			]
+		},
 		"flow_control_try_block": {
 			"begin": "^\\s*(TRY)\\b",
 			"beginCaptures": {
@@ -1428,7 +1497,7 @@
 				},
 				{
 					"name": "keyword.control.end.powerbasic",
-					"match": "\\b(END)\\b"
+					"match": "\\b(END)\\b(?!\\s+[^\\s\\'])"
 				},
 				{
 					"match": "(\\bEXIT\\b),?(\\s+[A-Z]+\\s)?",
