@@ -770,6 +770,9 @@
 					"include": "#flow_control_for_loop"
                 },
                 {
+					"include": "#flow_control_try_block"
+                },
+                {
 					"include": "#flow_control_while_loop"
                 }
             ]
@@ -809,9 +812,6 @@
 				}
 			},
 			"patterns": [
-				{
-					"include": "#flow_control_exits"
-				},
 				{
 					"include": "#process_contents"
 				}
@@ -1033,15 +1033,72 @@
                 }
             ]
         },
-		"flow_control_while_loop": {
-			"comment": "while loop",
-			"begin": "^\\s*WHILE",
-			"end": "^\\s*WEND",
+		"flow_control_try_block": {
+			"begin": "^\\s*(TRY)\\b",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.begin.try.powerbasic"
+				}
+			},
+			"end": "^\\s*(END TRY)\\b",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.end.try.powerbasic"
+				}
+			},
 			"patterns": [
 				{
-					"include": "process_contents"
+					"name": "keyword.control.catch.try.powerbasic",
+					"match": "^\\s*(CATCH)\\b"
+				},
+				{
+					"name": "keyword.control.finally.try.powerbasic",
+					"match": "^\\s*(FINALLY)\\b"
+				},
+				{
+					"include": "#process_contents"
 				}
 			]
+		},
+		"flow_control_while_loop": {
+			"comment": "while loop",
+			"begin": "^\\s*(WHILE)(?:\\s+(.*))?",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.begin.while_loop.powerbasic"
+				},
+				"2": {
+					"patterns": [
+						{
+							"include": "#expression"
+						}
+					]
+				}
+			},
+			"end": "^\\s*(WEND)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.end.while_loop.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#process_contents"
+				}
+			]
+		},
+		"labels": {
+			"name": "support.label.powerbasic",
+			"match": "\\b(\\w+:)",
+			"captures": {
+				"1": {
+					"patterns": [
+						{
+							"include": "#numbers"
+						}
+					]
+				}
+			}
 		},
         "numbers": {
             "name": "constant.numeric.powerbasic",
@@ -1152,10 +1209,85 @@
 			"comment": "PowerBASIC built-in functions. Some have odd syntax (arguments w/o parentheses, arguments not comma-separated)",
 			"patterns": [
 				{
+					"include": "#process_built-ins_console"
+				},
+				{
+					"include": "#process_built-ins_error"
+				},
+				{
+					"include": "#process_built-ins_file-io"
+				},
+				{
+					"include": "#process_built-ins_flow"
+				},
+				{
+					"include": "#process_built-ins_goto"
+				},
+				{
+					"include": "#process_built-ins_info"
+				},
+				{
 					"comment": "string equates",
 					"name": "support.equate.string.powerbasic",
 					"match": "(?<=[\\s\\(,])(\\${1,2}[A-Za-z]+)"
 				},
+
+                {
+                    "name": "keyword.let.powerbasic",
+                    "match": "\\bLET\\b"
+                },
+                {
+                    "name": "keyword.parse.powerbasic",
+                    "match": "\\bPARSE\\b"
+                },
+                {
+                    "name": "keyword.shell.powerbasic",
+                    "match": "\\bSHELL\\b"
+                },
+				{
+					"match": "\\b(UCODEPAGE)((?:\\s+(?!TO)\\S+)+)?(?:\\s+(TO))?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.command.ucodepage.powerbasic"
+						},
+						"2": {
+							"name": "meta.new.codepage.powerbasic",
+							"patterns": [
+								{
+									"name": "support.new.codepage.powerbasic",
+									"match": "(ANSI|OEM)"
+								},
+								{
+									"include": "#expression"
+								}
+							]
+						},
+						"3": {
+							"name": "support.assign.previous.codepage.powerbasic"
+						},
+						"4": {
+							"name": "support.previous.codepage.powerbasic",
+							"patterns": [
+								{
+									"include": "#expression"
+								}
+							]
+						}
+					}
+				},
+				{
+					"comment": "",
+					"name": "",
+					"match": "",
+					"captures": {
+						"1": {
+						}
+					}
+				}
+			]
+		},
+		"process_built-ins_console": {
+			"patterns": [
 				{
 					"comment": "clear screen",
 					"name": "keyword.control.clear_screen.powerbasic",
@@ -1165,6 +1297,11 @@
 					"comment": "console caption",
 					"name": "keyword.control.console_caption.powerbasic",
 					"match": "\\b(CONSNAME\\$)\\b"
+				},
+				{
+					"comment": "console",
+					"name": "keyword.control.console.powerbasic",
+					"match": "\\b(CONSOLE)\\b"
 				},
 				{
 					"comment": "console color",
@@ -1225,14 +1362,73 @@
 							]
 						}
 					}
+				}
+			]
+		},
+		"process_built-ins_error": {
+			"patterns": [
+				{
+					"name": "keyword.control.erl.powerbasic",
+					"match": "\\b(ERL\\$?)\\b"
+				},
+				{
+					"match": "\\b(ERROR)\\b(?:\\s+([^\\s\\']+))?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.error.throw.powerbasic"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#numbers"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "keyword.control.current.error.powerbasic",
+					"match": "\\b(ERR)\\b"
+				},
+				{
+					"name": "keyword.control.clear.error.powerbasic",
+					"match": "\\b(ERRCLEAR)\\b"
+				},
+				{
+					"name": "keyword.control.description.error.powerbasic",
+					"match": "\\b(ERROR\\$)"
+				},
+				{
+					"match": "\\b(ON\\s+ERROR)\\b(?:\\s+(RESUME\\s+NEXT|GOTO\\s+\\w+))?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.on.error.powerbasic"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#process_built-ins_goto"
+								},
+								{
+									"name": "keyword.control.resume.on.error.powerbasic",
+									"match": "\\bRESUME\\s+NEXT\\b"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		"process_built-ins_flow": {
+			"patterns": [
+				{
+					"comment": "call process",
+					"name": "keyword.control.clear_screen.powerbasic",
+					"match": "\\b(CALL)\\b"
 				},
 				{
 					"name": "keyword.control.end.powerbasic",
 					"match": "\\b(END)\\b"
-				},
-				{
-					"name": "keyword.control.environ.powerbasic",
-					"match": "\\b(ENVIRON\\$?)\\b"
 				},
 				{
 					"match": "(\\bEXIT\\b),?(\\s+[A-Z]+\\s)?",
@@ -1245,8 +1441,12 @@
 							"match": "(DO|FASTPROC|FOR|FUNCTION|IF|LOOP|MACRO|METHOD|PROPERTY|SELECT|SUB|TRY|ITERATE)"
 						}
 					}
-				},
-                {
+				}
+			]
+		},
+		"process_built-ins_file-io": {
+			"patterns": [
+				{
                     "name": "keyword.control.environ.powerbasic",
                     "match": "\\b(FILEATTR)\\b"
                 },
@@ -1460,54 +1660,37 @@
                 {
                     "name": "keyword.kill.powerbasic",
                     "match": "\\bKILL\\b"
-                },
-                {
-                    "name": "keyword.parse.powerbasic",
-                    "match": "\\bPARSE\\b"
-                },
-                {
-                    "name": "keyword.shell.powerbasic",
-                    "match": "\\bSHELL\\b"
-                },
-				{
-					"match": "\\b(UCODEPAGE)((?:\\s+(?!TO)\\S+)+)?(?:\\s+(TO))?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
-					"captures": {
-						"1": {
-							"name": "keyword.control.command.ucodepage.powerbasic"
+                }
+			]
+		},
+		"process_built-ins_goto": {
+			"match": "\\b(GOTO)\\b(?:\\s+(\\w+))?",
+			"captures": {
+				"1": {
+					"name": "keyword.control.goto.error.powerbasic"
+				},
+				"2": {
+					"patterns": [
+						{
+							"include": "#numbers"
 						},
-						"2": {
-							"name": "meta.new.codepage.powerbasic",
-							"patterns": [
-								{
-									"name": "support.new.codepage.powerbasic",
-									"match": "(ANSI|OEM)"
-								},
-								{
-									"include": "#expression"
-								}
-							]
-						},
-						"3": {
-							"name": "support.assign.previous.codepage.powerbasic"
-						},
-						"4": {
-							"name": "support.previous.codepage.powerbasic",
-							"patterns": [
-								{
-									"include": "#expression"
-								}
-							]
+						{
+							"name": "support.label.goto.powerbasic",
+							"match": "\\b\\w+\\b"
 						}
-					}
+					]
+				}
+			}
+		},
+		"process_built-ins_info": {
+			"patterns": [
+				{
+					"name": "keyword.control.environ.powerbasic",
+					"match": "\\b(ENVIRON\\$?)\\b"
 				},
 				{
-					"comment": "",
-					"name": "",
-					"match": "",
-					"captures": {
-						"1": {
-						}
-					}
+					"name": "keyword.parameter.powerbasic",
+					"match": "\\bPARAMETER\\$"
 				}
 			]
 		},
@@ -1570,6 +1753,9 @@
                 },
                 {
                     "include": "#comment_line"
+                },
+                {
+                    "include": "#labels"
                 },
                 {
                     "include": "#flow_control"
@@ -1845,7 +2031,7 @@
 					"match": "^\\s*(LOCAL|STATIC|INSTANCE|THREADED|GLOBAL)((?:\\s+[^\\s\\']+)+)(?:\\s+(\\'.*))?",
 					"captures": {
 						"1": {
-							"name": "keyword.control.declaration.variable.powerbasic"
+							"name": "keyword.declaration.scope.powerbasic"
 						},
 						"2": {
 							"patterns": [
@@ -1865,7 +2051,7 @@
 				},
 				{
 					"comment": "variable dimension",
-					"match": "^\\s*(DIM)((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
+					"match": "^\\s*(DIM)((?:\\s+[^\\s\\']+)+)?(?:\\s+(AS(?:\\s+[A-Z]+)?(?:\\s+[A-Z]+)?))?(?:\\s+(\\'.*))?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.dimension.variable.powerbasic"
@@ -1874,6 +2060,13 @@
 							"patterns": [
 								{
 									"include": "#variable"
+								}
+							]
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#variable_type_specifier"
 								}
 							]
 						},
@@ -1966,14 +2159,18 @@
             ]
         },
         "variable_type_specifier": {
-            "match": "(AS)\\s+([A-Z]+)",
+            "match": "(AS)(?:\\s+([A-Z]+))?(?:\\s+([A-Z]+))?",
             "captures": {
                 "1": {
                     "name": "support.identifier.type.variable.powerbasic"
                 },
                 "2": {
+                    "name": "keyword.declaration.scope.powerbasic",
+                    "match": "\\b(LOCAL|STATIC|INSTANCE|THREADED|GLOBAL)\\b"
+                },
+                "3": {
                     "name": "support.variable.type.specifier",
-                    "match": "(PTR|POINTER|INTEGER|LONG|QUAD|BYTE|WORD|DWORD|SINGLE|DOUBLE|EXT|EXTENDED|CUR|CURRENCY|CUX|CURRENCYX|STRING|ASCIIZ|STRINGZ|FIELD|WSTRING|WSTRINGZ|WFIELD|VARIANT|GUID|IAUTOMATION|IDISPATCH|IUNKNOWN)\\b"
+                    "match": "\\b(PTR|POINTER|INTEGER|LONG|QUAD|BYTE|WORD|DWORD|SINGLE|DOUBLE|EXT|EXTENDED|CUR|CURRENCY|CUX|CURRENCYX|STRING|ASCIIZ|STRINGZ|FIELD|WSTRING|WSTRINGZ|WFIELD|VARIANT|GUID|IAUTOMATION|IDISPATCH|IUNKNOWN)\\b"
                 }
             }
         }
