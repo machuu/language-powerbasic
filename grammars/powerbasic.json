@@ -62,13 +62,13 @@
 		},
         "comment_line": {
             "name": "comment.line.powerbasic",
-            "begin": "(^\\s*|\\s+)\\'",
+            "begin": "(^\\s*|\\s+)(\\'|_)",
             "beginCaptures": {
                 "0": {
                     "name": "punctuation.definition.comment.powerbasic"
                 }
             },
-            "end": "\\n|(?=\\?>)"
+            "end": "\\n"
         },
         "comment_block": {
             "patterns": [
@@ -1056,7 +1056,7 @@
                 },
                 {
                     "comment": "match arithmetic operators",
-                    "match": "([\\+\\-\\*\\/\\^]|MOD)",
+                    "match": "([\\+\\-\\*\\/\\^]|\\bMOD\\b)",
                     "name": "support.operator.arithmetic.powerbasic"
                 },
                 {
@@ -1069,13 +1069,43 @@
 		"processes": {
 			"comment": "Include all process blocks: Function, Sub, etc.",
 			"patterns": [
-				{
-					"include": "#process_declaration_function"
-				},
-				{
-					"include": "#process_declaration_sub"
-				}
-			]
+                {
+                    "name": "meta.process.function.powerbasic",
+                    "begin": "^\\s*(?=FUNCTION)",
+		            "end": "(END FUNCTION)",
+		            "endCaptures": {
+		                "1": {
+		                    "name": "keyword.control.function.end.powerbasic"
+		                }
+		            },
+		            "patterns": [
+		                {
+		                    "include": "#process_declaration_line_function"
+		                },
+		                {
+		                    "include": "#process_contents"
+		                }
+		            ]
+                },
+                {
+                    "name": "meta.process.function.powerbasic",
+                    "begin": "^\\s*(?=SUB)",
+		            "end": "(END SUB)",
+		            "endCaptures": {
+		                "1": {
+		                    "name": "keyword.control.sub.end.powerbasic"
+		                }
+		            },
+		            "patterns": [
+		                {
+		                    "include": "#process_declaration_line_sub"
+		                },
+		                {
+		                    "include": "#process_contents"
+		                }
+		            ]
+                }
+            ]
 		},
         "process_alias": {
             "name": "meta.function.declaration.alias.powerbasic",
@@ -1515,7 +1545,7 @@
 		                    ]
 		                }
 		            },
-		            "end": "(\\))",
+		            "end": "(\\)|(?<!_)\\n)",
 		            "endCaptures": {
 		                "1": {
 		                    "patterns": [
@@ -1552,31 +1582,8 @@
                 }
             ]
         },
-        "process_declaration": {
-            "name": "meta.process.declaration.powerbasic",
-            "patterns": [
-                {
-                    "name": "meta.process.function.declaration.powerbasic",
-                    "match": "^\\s*(FUNCTION.*)",
-                    "captures": {
-                        "1": {
-                            "include": "#process_declaration_function"
-                        }
-                    }
-                },
-                {
-                    "name": "meta.process.sub.declaration.powerbasic",
-                    "match": "^\\s*(SUB.*)",
-                    "captures": {
-                        "1": {
-                            "include": "#process_declaration_sub"
-                        }
-                    }
-                }
-            ]
-        },
-        "process_declaration_function": {
-            "begin": "^\\s*(FUNCTION)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\(.*\\)))?(?:\\s+(?!AS)(\\S+))?(?:\\s+(AS\\s+\\S+))?",
+        "process_declaration_line_function": {
+            "begin": "^\\s*(FUNCTION)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\())",
             "beginCaptures": {
                 "1": {
                     "name": "keyword.control.function.declare.powerbasic"
@@ -1594,43 +1601,33 @@
                             "include": "#process_alias"
                         }
                     ]
-                },
-                "4": {
-                    "patterns": [
-                        {
-                            "include": "#process_arguments"
-                        }
-                    ]
-                },
-                "5": {
+                }
+            },
+			"end": "(?:(\\))(?:\\s+(?!AS)(\\S+))?(?:\\s+(AS\\s+\\S+))?|(?<!_)\\n)",
+			"endCaptures": {
+				"2": {
                     "patterns": [
                         {
                             "include": "#process_descriptor"
                         }
                     ]
                 },
-                "6": {
+                "3": {
                     "patterns": [
                         {
                             "include": "#variable_type_specifier"
                         }
                     ]
                 }
-            },
-            "end": "(END FUNCTION)",
-            "endCaptures": {
-                "1": {
-                    "name": "keyword.control.function.end.powerbasic"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#process_contents"
-                }
-            ]
+			},
+			"patterns": [
+				{
+					"include": "#process_arguments"
+				}
+			]
         },
-        "process_declaration_sub": {
-            "begin": "^\\s*(SUB)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\(.*\\)))?(?:\\s+(?!AS)(\\S+))?",
+        "process_declaration_line_sub": {
+            "begin": "^\\s*(SUB)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\())?",
             "beginCaptures": {
                 "1": {
                     "name": "keyword.control.sub.declare.powerbasic"
@@ -1648,33 +1645,23 @@
                             "include": "#process_alias"
                         }
                     ]
-                },
-                "4": {
-                    "patterns": [
-                        {
-                            "include": "#process_arguments"
-                        }
-                    ]
-                },
-                "5": {
+                }
+            },
+            "end": "(?:(\\))(?:\\s+(?!AS)(\\S+))?|(?<!_)\\n)",
+			"endCaptures": {
+				"2": {
                     "patterns": [
                         {
                             "include": "#process_descriptor"
                         }
                     ]
                 }
-            },
-            "end": "(END SUB)",
-            "endCaptures": {
-                "1": {
-                    "name": "keyword.control.sub.end.powerbasic"
-                }
-            },
-            "patterns": [
-                {
-                    "include": "#process_contents"
-                }
-            ]
+			},
+			"patterns": [
+				{
+					"include": "#process_arguments"
+				}
+			]
         },
         "process_descriptor": {
             "name": "keyword.process.descriptor.powerbasic",
@@ -1729,7 +1716,7 @@
                     "name": "punctuation.definition.string.begin.powerbasic"
                 }
             },
-            "end": "\"",
+            "end": "(\"|(?<!_)\\n)",
             "endCaptures": {
                 "0": {
                     "name": "punctuation.definition.string.end.powerbasic"
