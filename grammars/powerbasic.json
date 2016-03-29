@@ -15,41 +15,153 @@
             "include": "#preprocessor"
         },
         {
-            "include": "#processes"
+            "include": "#blocks"
         }
     ],
     "repository": {
-        "standard_include": {
-            "patterns": [
+		"blocks": {
+			"comment": "Include all top-level code blocks: Function, Sub, Type, Class, etc.",
+			"patterns": [
                 {
-                    "include": "#preprocessor_metastatement"
+                    "include": "#block_class"
                 },
                 {
-                    "include": "#comment_block"
+                    "include": "#block_function"
                 },
                 {
-                    "include": "#comment_line"
+					"include": "#block_sub"
                 },
                 {
-                    "include": "#process_declaration"
-                },
-                {
-                    "include": "#conditional"
-                },
-                {
-                    "include": "#variable_declaration"
-                },
-                {
-                    "include": "#flow_control"
-                },
-                {
-                    "include": "#process_call"
-                },
-                {
-                    "include": "#statement"
+					"include": "#block_type"
                 }
             ]
-        },
+		},
+		"block_class": {
+			"name": "meta.class.powerbasic",
+			"begin": "(?=^\\s*\\bCLASS\\b\\s+(?!METHOD))",
+			"end": "(\\bEND CLASS\\b)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.class.end.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#declaration_line_class"
+				},
+				{
+					"include": "#block_contents_class"
+				}
+			]
+		},
+		"block_function": {
+			"name": "meta.process.function.powerbasic",
+			"begin": "(?=^\\s*\\bFUNCTION\\b)",
+			"end": "(\\bEND FUNCTION\\b)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.function.end.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#declaration_line_function"
+				},
+				{
+					"include": "#block_contents_process"
+				}
+			]
+		},
+		"block_interface": {
+			"name": "meta.class.interface.powerbasic",
+			"begin": "(?=^\\s*\\bINTERFACE\\b)",
+			"end": "(\\bEND INTERFACE\\b)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.interface.end.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#declaration_line_interface"
+				},
+				{
+					"include": "#block_contents_interface"
+				}
+			]
+		},
+		"block_method": {
+			"name": "meta.class.method.powerbasic",
+			"begin": "(?=^\\s*(?:(?:CLASS|OVERRIDE)\\s+)?\\bMETHOD\\b)",
+			"end": "(\\bEND METHOD\\b)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.method.end.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#declaration_line_method"
+				},
+				{
+					"include": "#block_contents_method"
+				}
+			]
+		},
+		"block_property": {
+			"name": "meta.class.property.powerbasic",
+			"begin": "(?=^\\s*\\bPROPERTY\\b)",
+			"end": "(\\bEND PROPERTY\\b)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.property.end.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#declaration_line_property"
+				},
+				{
+					"include": "#block_contents_property"
+				}
+			]
+		},
+		"block_sub": {
+			"name": "meta.process.sub.powerbasic",
+			"begin": "(?=^\\s*\\bSUB\\b)",
+			"end": "(\\bEND SUB\\b)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.sub.end.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#declaration_line_sub"
+				},
+				{
+					"include": "#block_contents_process"
+				}
+			]
+		},
+		"block_type": {
+			"name": "meta.process.type.powerbasic",
+			"begin": "(?=^\\s*\\bTYPE\\b)",
+			"end": "(\\bEND TYPE\\b)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.type.end.powerbasic"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#declaration_line_type"
+				},
+				{
+					"include": "#block_contents_type"
+				}
+			]
+		},
 		"comments": {
 			"patterns": [
 				{
@@ -62,9 +174,9 @@
 		},
         "comment_line": {
             "name": "comment.line.powerbasic",
-            "begin": "(^\\s*|\\s+)(\\'|_)",
+            "begin": "(?:^\\s*|\\s+)(\\'|_)",
             "beginCaptures": {
-                "0": {
+                "1": {
                     "name": "punctuation.definition.comment.powerbasic"
                 }
             },
@@ -104,82 +216,32 @@
                 }
             ]
         },
-        "preprocessor": {
+        "block_contents_class": {
             "patterns": [
                 {
-                    "include": "#preprocessor_if_block"
+                    "include": "#comments"
                 },
                 {
-                    "include": "#preprocessor_metastatements"
+                    "include": "#block_method"
+                },
+                {
+                    "include": "#block_interface"
+                },
+                {
+                    "include": "#variable_declaration"
                 }
             ]
         },
-        "preprocessor_if_block": {
-            "comment": "preprocessor flow_control_if_block",
-            "begin": "\\b(#(IF))\\s*(?:\\s+(.+)\\s+)?(THEN)(\\s\\'.*)?",
-            "beginCaptures": {
-                "1": {
-                    "name": "meta.keyword.control.ifblock.preprocessor.powerbasic"
-                },
-                "2": {
-                    "name": "keyword.control.if.preprocessor.powerbasic"
-                },
-                "3": {
-                    "patterns": [
-                        {
-                            "include": "#expression"
-                        }
-                    ]
-                },
-                "4": {
-                    "name": "keyword.control.then.preprocessor.powerbasic"
-                },
-                "5": {
-                    "patterns": [
-                        {
-                            "include": "#comment_line"
-                        }
-                    ]
-                }
-            },
-            "end": "(#(ENDIF))\\s+(.*)(\\s+\\'.*)?",
-            "endCaptures": {
-                "1": {
-                    "name": "meta.keyword.control.ifblock.preprocessor.powerbasic"
-                },
-                "2": {
-                    "name": "keyword.control.endif.preprocessor.powerbasic"
-                },
-                "3": {
-                    "name": "invalid.illegal.expression.endif.preprocessor.powerbasic"
-                },
-                "4": {
-                    "patterns": [
-                        {
-                            "include": "#comment_line"
-                        }
-                    ]
-                }
-            },
+        "block_contents_if": {
             "patterns": [
                 {
-                    "include": "#preprocessor_if_contents"
-                }
-            ]
-        },
-        "preprocessor_if_contents": {
-            "patterns": [
-                {
-                    "include": "#preprocessor_if_block"
-                },
-                {
-                    "match": "(#(ELSEIF))\\s+(.*)THEN(\\s+\\'.*)?",
+                    "match": "\\s*\\b((ELSEIF))\\b\\s(.*)\\s\\b(THEN)",
                     "captures": {
                         "1": {
-                            "name": "meta.keyword.control.ifblock.sub.preprocessor.powerbasic"
+                            "name": "meta.keyword.control.ifblock.sub.powerbasic"
                         },
                         "2": {
-                            "name": "keyword.control.elseif.preprocessor.powerbasic"
+                            "name": "keyword.control.elseif.powerbasic"
                         },
                         "3": {
                             "patterns": [
@@ -189,461 +251,275 @@
                             ]
                         },
                         "4": {
-                            "patterns": [
-                                {
-                                    "include": "#comment_line"
-                                }
-                            ]
+                            "name": "keyword.control.then.powerbasic"
                         }
                     }
                 },
                 {
-                    "match": "(#(ELSE))\\s+(.*)(\\s+\\'.*)?",
+                    "match": "((ELSE\\b))",
                     "captures": {
                         "1": {
-                            "name": "meta.keyword.control.ifblock.preprocessor.powerbasic"
+                            "name": "meta.keyword.control.ifblock.powerbasic"
                         },
                         "2": {
-                            "name": "keyword.control.else.preprocessor.powerbasic"
-                        },
-                        "3": {
-                            "name": "invalid.illegal.expression.endif.preprocessor.powerbasic"
-                        },
-                        "4": {
-                            "patterns": [
-                                {
-                                    "include": "#comment_line"
-                                }
-                            ]
+                            "name": "keyword.control.else.powerbasic"
                         }
                     }
                 },
                 {
-                    "include": "$base"
+                    "include": "#block_contents_process"
                 }
             ]
         },
-        "preprocessor_metastatements": {
+        "block_contents_interface": {
             "patterns": [
-                {
-                    "name": "meta.align.metastatement.preprocessor.powerbasic",
-                    "match": "#(ALIGN)(\\s+\\S+)?",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.align.compiler.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "name": "keyword.align.compiler.metastatement.preprocessor.powerbasic"
-                        },
-                        "3": {
-                            "patterns": [
-                                {
-                                    "name": "constant.numeric.boundary.align.metastatement.powerbasic",
-                                    "match": "\\b(4|8|16|32|64|128|256|2)\\b"
-                                },
-                                {
-                                    "name": "invalid.illegal.numeric.boundary.align.metastatement.powerbasic",
-                                    "match": "\\b(?!(4|8|16|32|64|128|256|2)).+\\b"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "match": "#(BLOAT)\\b(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.bloat.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "name": "support.expression.bloat.metatstatement.preprocessor.powerbasic",
-                            "match": "\\(?(\\d+)\\s*(\\))?([\\+\\-\\*\\/\\^])(\\()?\\s*(\\d+)+",
-                            "captures": {
-                                "1": {
-                                    "patterns": [
-                                        {
-                                            "include": "#numbers"
-                                        }
-                                    ]
-                                },
-                                "2": {
-                                    "name": "punctuation.parantheses.open.powerbasic"
-                                },
-                                "3": {
-                                    "patterns": [
-                                        {
-                                            "include": "#operators"
-                                        }
-                                    ]
-                                },
-                                "4": {
-                                    "name": "punctuation.parantheses.open.powerbasic"
-                                },
-                                "5": {
-                                    "patterns": [
-                                        {
-                                            "include": "#numbers"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "match": "#(COMPILE)(\\s+\\S+)?(?:\\s+(\".*\"))?",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.compile.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.compile.metastatement.preprocessor.powerbasic",
-                                    "match": "(EXE|SLL)"
-                                },
-                                {
-                                    "name": "invalid.keyword.compile.metastatement.preprocessor.powerbasic",
-                                    "match": "\\b(?!(EXE|SLL)).+\\b"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "patterns": [
-                                {
-                                    "include": "#quoted_string"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "match": "#(COMPILER)(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.compiler.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.name.compiler.metatstatement.preprocessor.powerbasic",
-                                    "match": "(PBCC|PBWIN)"
-                                },
-                                {
-                                    "name": "invalid.keyword.name.compiler.metatstatement.preprocessor.powerbasic",
-                                    "match": "(?!(PBCC|PBWIN)).*"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "include": "#numbers"
-                        }
-                    }
-                },
-                {
-                    "match": "#(OPTIMIZE)(\\s+[A-Z]{4,5}+\\s+[A-Z]{2,3}|[A-Z]+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.optimize.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "name": "support.argument.optimize.metatstatement.preprocessor.powerbasic",
-                            "match":"^(CODE ON|CODE OFF|CODE|SPEED|SIZE)$"
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.optimize.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(OPTION)(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.option.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.option.metastatement.preprocessor.powerbasic",
-                                    "match": "(ANSIAPI|LARGEMEM32|VERSION3|VERSION4|VERSION5|WIN95)"
-                                },
-                                {
-                                    "name": "invalid.illegal.argument.option.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!(ANSIAPI|LARGEMEM32|VERSION3|VERSION4|VERSION5|WIN95)).*"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.option.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(REGISTER)(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.register.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.register.metastatement.preprocessor.powerbasic",
-                                    "match": "(ALL|DEFAULT|NONE)"
-                                },
-                                {
-                                    "name": "invalid.illegal.argument.register.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!(ALL|DEFAULT|NONE))\\S+"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.register.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(DIM)(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.dim.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.dim.metastatement.preprocessor.powerbasic",
-                                    "match": "(ALL|NONE)"
-                                },
-                                {
-                                    "name": "invalid.illegal.argument.dim.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!(ALL|NONE))\\S+"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.dim.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(UNIQUE)(\\s+\\S+)?(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.unique.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.unique.metastatement.preprocessor.powerbasic",
-                                    "match": "(VAR)"
-                                },
-                                {
-                                    "name": "invalid.illegal.argument.unique.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!VAR)\\S+"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "patterns": [
-                                {
-                                    "name": "support.state.argument.unique.metastatement.preprocessor.powerbasic",
-                                    "match": "(ON|OFF)"
-                                },
-                                {
-                                    "name": "invalid.illegal.state.argument.unique.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!(ON|OFF))\\S+"
-                                }
-                            ]
-                        },
-                        "4": {
-                            "name": "invalid.illegal.argument.unique.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(UTILITY)(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.utility.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "include": "#quoted_string"
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.unique.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(BREAK)(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.break.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.break.metastatement.preprocessor.powerbasic",
-                                    "match": "(ON|OFF)"
-                                },
-                                {
-                                    "name": "invalid.illegal.argument.break.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!(ON|OFF))\\S+"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.unique.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(CONSOLE)(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.console.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.console.metastatement.preprocessor.powerbasic",
-                                    "match": "(ON|OFF)"
-                                },
-                                {
-                                    "name": "invalid.illegal.argument.console.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!ON|OFF)"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.unique.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "(#DEBUG)(\\s+[A-Z]+\\s+[A-Z]{2,3}|\\s+[A-Z]+\\s+\".*\"|\\s+[A_Z]+)?\\s+(.*)",
-                    "captures": {
-                        "1": {
-                            "name": "keyword.debug.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.debug.metastatement.preprocessor.powerbasic",
-                                    "match": "(CODE ON|CODE OFF|CODE|DISPLAY ON|DISPLAY|ERROR OFF|ERROR ON|ERROR)"
-                                },
-                                {
-                                    "name": "support.argument.debug.metastatement.preprocessor.powerbasic",
-                                    "match": "(PRINT)(?:\\s+(\".*\"))?",
-                                    "captures": {
-                                        "1": {
-                                            "name": "support.print.debug.metastatement.preprocessor.powerbasic"
-                                        },
-                                        "2": {
-                                            "name": "support.string.print.debug.metastatement.preprocessor.powerbasic",
-                                            "patterns": [
-                                                {
-                                                    "include": "#quoted_string"
-                                                }
-                                            ]
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "invalid.illegal.argument.debug.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!(CODE ON|CODE OFF|CODE|DISPLAY ON|DISPLAY|ERROR OFF|ERROR ON|ERROR|PRINT))\\S+(\\s+\\S+)?"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.debug.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(TOOLS)(\\s+\\S+)?\\s+(.*)",
-                    "captures": {
-                        "2": {
-                            "name": "keyword.tools.metastatement.preprocessor.powerbasic"
-                        },
-                        "3": {
-                            "patterns": [
-                                {
-                                    "name": "support.argument.tools.metastatement.preprocessor.powerbasic",
-                                    "match": "(ON|OFF)"
-                                },
-                                {
-                                    "name": "invalid.illegal.argument.tools.metastatement.preprocessor.powerbasic",
-                                    "match": "(?!(ON|OFF))\\S+"
-                                }
-                            ]
-                        },
-                        "3": {
-                            "name": "invalid.illegal.argument.debug.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(PAGE)\\b(\\s.*)?",
-                    "captures": {
-                        "1": {
-							"name": "keyword.page.metastatement.preprocessor.powerbasic"
-                        },
-                        "2": {
-                            "name": "invalid.illegal.argument.page.metastatement.powerbasic"
-                        }
-                    }
-                },
-                {
-                    "match": "#(INCLUDE)\\b(?:\\s+(\".*\"))?",
-                    "captures": {
-                        "1": {
-							"name": "keyword.include.metastatement.preprocessor.powerbasic"
-                        },
-						"2": {
-							"patterns": [
-								{
-									"include": "#quoted_string"
-								}
-							]
-						}
-                    }
-                },
-                {
-                    "name": "keyword.link.metastatement.preprocessor.powerbasic",
-                    "match": ""
-                },
-                {
-                    "name": "keyword.export.metastatement.preprocessor.powerbasic",
-                    "match": ""
-                },
-                {
-                    "match": "(#RESOURCE)\\b(?:\\s+(\\w+))?(?:\\s*,\\s*(\\w+))?(?:\\s*,\\s*(\".*\")(?:\\$\\$)?)?(?:\\s*,\\s*(\\w+))?",
+				{
+					"match": "(\\bINHERIT\\b)(?:\\s+(\\w+))?(?:\\s*,\\s*(\\w+))?",
 					"captures": {
 						"1": {
-							"name": "keyword.resource.metastatement.preprocessor.powerbasic"
+							"name": "keyword.inherit.interface.powerbasic"
 						},
 						"2": {
-							"name": "support.type.resource.preprocessor.powerbasic",
-							"match": "(BITMAP|ICON|MANIFEST|RCDATA|STRING|WAVE)"
-						},
-						"3": {
-							"name": "support.resid.resource.preprocessor.powerbasic",
-							"match": "\\b(\\d+|\\w+)"
-						},
-						"4": {
 							"patterns": [
 								{
-									"include": "#quoted_string"
+									"name": "keyword.iunknown.inherit.interface.powerbasic",
+									"match": "\\bIUNKNOWN\\b"
+								},
+								{
+									"name": "entity.name.class.inherit.interface.powerbasic",
+									"match": "(?!\\bINKNOWN\\b)\\w+"
 								}
 							]
 						},
-						"5": {
-							"name": "support.langid.resource.metastatement.preprocessor.powerbasic",
-							"match": "&H\\d{4}"
+						"3": {
+							"name": "entity.name.class.inherit.interface.powerbasic"
 						}
 					}
+				},
+                {
+                    "include": "#comments"
+                },
+                {
+                    "include": "#block_method"
+                },
+                {
+                    "include": "#block_property"
                 }
             ]
+        },
+        "block_contents_method": {
+            "patterns": [
+                {
+                    "include": "#block_contents_process"
+                }
+            ]
+        },
+        "block_contents_property": {
+            "patterns": [
+                {
+                    "include": "#block_contents_process"
+                }
+            ]
+        },
+        "block_contents_process": {
+            "patterns": [
+                {
+                    "include": "#comment_block"
+                },
+                {
+                    "include": "#comment_line"
+                },
+                {
+                    "include": "#labels"
+                },
+                {
+                    "include": "#flow_control"
+                },
+                {
+                    "include": "#variable_declaration"
+                },
+                {
+                    "include": "#expression"
+                }
+            ]
+        },
+        "block_contents_type": {
+            "patterns": [
+                {
+                    "include": "#comment_block"
+                },
+                {
+                    "include": "#comment_line"
+                },
+                {
+                    "include": "#variable"
+                }
+            ]
+        },
+		"declarations_outside_processes": {
+            "patterns": [
+				{
+					"include": "#variable_declaration"
+				},
+				{
+					"begin": "^\\s*(DECLARE)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.declare.powerbasic"
+						}
+					},
+					"end": "(?!< _)\\n",
+					"patterns": [
+						{
+							"include": "#declaration_line_function"
+						},
+						{
+							"include": "#declaration_line_sub"
+						}
+					]
+				}
+            ]
+		},
+        "declaration_line_class": {
+            "match": "^\\s*(CLASS(?!\\s+METHOD))(?:\\s+(?!METHOD)(\\w+))?",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.class.declare.powerbasic"
+                },
+                "2": {
+                    "name": "entity.class.name.powerbasic"
+                }
+            }
+        },
+        "declaration_line_function": {
+            "name": "meta.declaration.function.powerbasic",
+            "begin": "(?:^|(?<=DECLARE))\\s*(FUNCTION)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\())?",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.control.function.declare.powerbasic"
+                },
+                "2": {
+                    "patterns": [
+                        {
+                            "include": "#process_names_function"
+                        }
+                    ]
+                },
+                "3": {
+                    "patterns": [
+                        {
+                            "include": "#process_alias"
+                        }
+                    ]
+                }
+            },
+			"end": "(?:(\\))(\\s+(?!AS)[A-Z]+)?(?:\\s+(AS\\s+[^\\s\\']+))?|(?<!_)\\n)",
+			"endCaptures": {
+				"2": {
+                    "patterns": [
+                        {
+                            "include": "#process_descriptor"
+                        }
+                    ]
+                },
+                "3": {
+                    "patterns": [
+                        {
+                            "include": "#variable_type_specifier"
+                        }
+                    ]
+                }
+			},
+			"patterns": [
+				{
+                    "name": "meta.arguments.process.powerbasic",
+					"include": "#process_arguments"
+				}
+			]
+        },
+        "declaration_line_interface": {
+            "match": "^\\s+(INTERFACE)(?:\\s+(\\w+))?",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.interface.declare.powerbasic"
+                },
+                "2": {
+                    "name": "entity.interface.name.powerbasic"
+                }
+            }
+        },
+        "declaration_line_method": {
+            "match": "^\\s*((?:(?:CLASS|OVERRIDE)\\s+)?METHOD)(?:\\s+(\\w+))?",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.method.declare.powerbasic"
+                },
+                "2": {
+                    "name": "entity.method.name.powerbasic"
+                }
+            }
+        },
+        "declaration_line_property": {
+            "match": "^\\s*(PROPERTY)(?:\\s+(GET|SET))?(?:\\s+(\\w+))?",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.property.declare.powerbasic"
+                },
+                "2": {
+                    "name": "support.direction.property.powerbasic"
+                },
+                "3": {
+                    "name": "variable.property.name.powerbasic"
+                }
+            }
+        },
+        "declaration_line_sub": {
+            "begin": "(?:^|(?<=DECLARE))\\s*(SUB)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\())?",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.control.sub.declare.powerbasic"
+                },
+                "2": {
+                    "patterns": [
+                        {
+                            "include": "#process_names_function"
+                        }
+                    ]
+                },
+                "3": {
+                    "patterns": [
+                        {
+                            "include": "#process_alias"
+                        }
+                    ]
+                }
+            },
+            "end": "(?:(\\))?(?:\\s+(?!AS)([^\\s\\']+))?|(?<!_)\\n)",
+			"endCaptures": {
+				"2": {
+                    "patterns": [
+                        {
+                            "include": "#process_descriptor"
+                        }
+                    ]
+                }
+			},
+			"patterns": [
+				{
+					"include": "#process_arguments"
+				}
+			]
+        },
+        "declaration_line_type": {
+            "match": "^\\s*(TYPE)(?:\\s+(\\w+))?",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.type.declare.powerbasic"
+                },
+                "2": {
+                    "name": "variable.type.name.powerbasic"
+                }
+            }
         },
         "expression": {
             "name": "meta.expression.powerbasic",
@@ -668,6 +544,9 @@
                             "include": "#expression"
                         }
                     ]
+                },
+                {
+                    "include": "#equates"
                 },
                 {
                     "include": "#quoted_string"
@@ -755,13 +634,137 @@
                 }
             ]
         },
+		"equates": {
+			"patterns": [
+				{
+					"include": "#equates_numeric"
+				},
+				{
+					"include": "#equates_string"
+				}
+			]
+		},
+		"equates_numeric": {
+			"name": "meta.equate.powerbasic",
+			"match": "(%\\w+\\b)",
+			"captures": {
+				"1": {
+					"patterns": [
+						{
+							"include": "#equates_numeric_builtin"
+						},
+						{
+							"name": "meta.support.equate.user-defined.powerbasic",
+							"match": "%\\w+"
+						}
+					]
+				}
+			}
+		},
+		"equates_numeric_builtin": {
+			"patterns": [
+				{
+					"name": "keyword.control.equate.isdefined.powerbasic",
+					"match": "%DEF"
+				}
+			]
+		},
+		"equates_string": {
+			"match": "(\\$\\w+\\b)",
+			"captures": {
+				"1": {
+					"patterns": [
+						{
+							"include": "#equates_string_built-in"
+						},
+						{
+							"name": "support.equate.user-defined.powerbasic",
+							"match": "\\$\\w+"
+						}
+					]
+				}
+			}
+		},
+		"equates_string_built-in": {
+			"patterns": [
+				{
+					"name": "support.equate.string.bell.powerbasic",
+					"match": "$BEL"
+				},
+				{
+					"name": "support.equate.string.backspace.powerbasic",
+					"match": "$BS"
+				},
+				{
+					"name": "support.equate.string.carraige-return.powerbasic",
+					"match": "$CR"
+				},
+				{
+					"name": "support.equate.string.crlf.powerbasic",
+					"match": "$CRLF"
+				},
+				{
+					"name": "support.equate.string.double-quote.powerbasic",
+					"match": "$DQ"
+				},
+				{
+					"name": "support.equate.string.two-double-quotes.powerbasic",
+					"match": "$DQ2"
+				},
+				{
+					"name": "support.equate.string.end-of-file.powerbasic",
+					"match": "$EOF"
+				},
+				{
+					"name": "support.equate.string.escape.powerbasic",
+					"match": "$ESC"
+				},
+				{
+					"name": "support.equate.string.form-feed.powerbasic",
+					"match": "$FF"
+				},
+				{
+					"name": "support.equate.string.line-feed.powerbasic",
+					"match": "$LF"
+				},
+				{
+					"name": "support.equate.string.null.powerbasic",
+					"match": "$NUL"
+				},
+                {
+                    "name": "support.equate.string.quote-comma-quote.powerbasic",
+                    "match": "$QCQ"
+                },
+				{
+					"name": "support.equate.string.space.powerbasic",
+					"match": "$SPC"
+				},
+				{
+					"name": "support.equate.string.single-quote.powerbasic",
+					"match": "$SQ"
+				},
+				{
+					"name": "support.equate.string.two-single-quotes.powerbasic",
+					"match": "$SQ2"
+				},
+				{
+					"name": "support.equate.string.horizontal-tab.powerbasic",
+					"match": "$TAB"
+				},
+				{
+					"name": "support.equate.string.vertical-tab.powerbasic",
+					"match": "$VT"
+				},
+				{
+					"name": "support.equate.string.whitespace.powerbasic",
+					"match": "$WHITESPACE"
+				}
+			]
+		},
         "flow_control": {
             "patterns": [
                 {
-                    "include": "#flow_control_if_line"
-                },
-                {
-                    "include": "#flow_control_if_block"
+                    "include": "#flow_control_if"
                 },
                 {
 					"include": "#flow_control_do_loop"
@@ -782,7 +785,8 @@
         },
 		"flow_control_do_loop": {
 			"comment": "do loop",
-			"begin": "^\\s*(DO)(?:\\s+(WHILE|UNTIL))?(?:\\s+(.*))?",
+			"name": "meta.loop.do.powerbasic",
+			"begin": "^\\s*(DO)(?:\\s+(WHILE|UNTIL))?((?:\\s+[^\\s\\':]+)+)?",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.begin.do_loop.powerbasic"
@@ -798,7 +802,7 @@
 					]
 				}
 			},
-			"end": "^\\s*(LOOP)(?:\\s+(WHILE|UNTIL))?(?:\\s+(.*))?",
+			"end": "^\\s*(LOOP)(?:\\s+(WHILE|UNTIL))?((?:\\s+[^\\s\\':]+)+)?",
 			"endCaptures": {
 				"1": {
 					"name": "keyword.end.do_loop.powerbasic"
@@ -816,13 +820,13 @@
 			},
 			"patterns": [
 				{
-					"include": "#process_contents"
+					"include": "#block_contents_process"
 				}
 			]
 		},
 		"flow_control_for_loop": {
 			"comment": "for loop",
-			"begin": "^\\s*(FOR)(?:\\s+(\\S+))?\\s*(=)?((?:\\s+(?!TO)[^\\s\\']+)+)?(TO)?((?:\\s+(?!STEP)[^\\s\\']+)+)?(?:\\s+(STEP)(?:\\s+[^\\s\\']+)+)?",
+			"begin": "^\\s*(FOR)(?:\\s+([^\\s\\']+))?\\s*(=)?((?:\\s+(?!TO)[^\\s\\']+)+)?(TO)?((?:\\s+(?!STEP)[^\\s\\']+)+)?(?:\\s+(STEP)(?:\\s+[^\\s\\']+)+)?",
 			"beginCaptures": {
 				"1": {
 					"comment": "Begin FOR LOOP",
@@ -870,7 +874,7 @@
 					]
 				}
 			},
-			"end": "^\\s*(NEXT)(?:\\s+(\\S+))?",
+			"end": "^\\s*(NEXT)(?:\\s+([^\\s\\']+))?",
 			"endCaptures": {
 				"1": {
 					"name": "keyword.end.for_loop.powerbasic"
@@ -885,154 +889,79 @@
 			},
 			"patterns": [
 				{
-					"include": "#process_contents"
+					"include": "#block_contents_process"
 				}
 			]
 		},
-        "flow_control_if_block": {
-            "comment": "multi-line if statement",
-            "begin": "^\\s*\\b((IF))(?:\\s+(.+)\\s+)?(\\bTHEN\\b)(\\s\\'.*)?",
-            "beginCaptures": {
-                "1": {
-                    "name": "meta.keyword.control.ifblock.powerbasic"
-                },
-                "2": {
-                    "name": "keyword.control.begin.ifblock.powerbasic"
-                },
-                "3": {
-                    "patterns": [
-                        {
-                            "include": "#expression"
-                        }
-                    ]
-                },
-                "4": {
-                    "name": "keyword.control.then.powerbasic"
-                },
-                "5": {
-                    "patterns": [
-                        {
-                            "include": "#comment_line"
-                        }
-                    ]
-                }
-            },
-            "end": "^\\s*((END IF))\\s+(.*)(\\s\\'.*)?",
+		"flow_control_if": {
+			"patterns": [
+				{
+					"include": "#flow_control_if_single_line"
+				},
+				{
+					"include": "#flow_control_if_start"
+				},
+				{
+					"include": "#flow_control_if_block"
+				}
+			]
+		},
+		"flow_control_if_block": {
+            "name": "meta.multi_line.if.powerbasic",
+			"begin": "(\\bTHEN\\b)(?!\\s+[^\\s\\':])",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.then.if.powerbasic"
+				}
+			},
+			"end": "(\\bEND IF\\b)",
             "endCaptures": {
                 "1": {
-                    "name": "meta.keyword.control.ifblock.powerbasic"
-                },
-                "2": {
-                    "name": "keyword.control.end.ifblock.powerbasic"
-                },
-                "3": {
-                    "name": "invalid.illegal.expression.endif.powerbasic"
-                },
-                "4": {
-                    "patterns": [
-                        {
-                            "include": "#comment_line"
-                        }
-                    ]
+                    "name": "keyword.control.end.if.powerbasic"
                 }
             },
-            "patterns": [
-                {
-					"name": "meta.contents.ifblock.powerbasic",
-                    "include": "#flow_control_if_contents"
-                }
-            ]
-        },
-        "flow_control_if_line": {
-            "name": "meta.conditional.singleline.powerbasic",
-            "begin": "^\\s*((IF))\\s+(.*)\\s+(THEN)((?:\\s+[^\\s\\']+)+)(?:\\s+(\\'.*))?",
-            "captures": {
+			"patterns": [
+				{
+					"include": "#block_contents_if"
+				}
+			]
+		},
+		"flow_control_if_single_line": {
+            "name": "meta.single_line.if.powerbasic",
+			"match": "(\\bTHEN\\b)((?:\\s+(?!ELSE)[^\\s\\']+)+)(?:\\s+\\b(ELSE)\\b)?((?:\\s+(?!ELSE)[^\\s\\'])+)?",
+			"captures": {
+				"1": {
+					"name": "keyword.control.then.if.powerbasic"
+				},
+				"2": {
+					"include": "#expression"
+				},
+				"3": {
+					"name": "keyword.control.else.powerbasic"
+				},
+				"4": {
+					"include": "#expression"
+				}
+			}
+		},
+        "flow_control_if_start": {
+            "comment": "declare if statement",
+			"name": "meta.declare.line.if.powerbasic",
+            "begin": "^\\s*\\b(IF)\\b",
+            "beginCaptures": {
                 "1": {
-                    "name": "meta.keyword.control.ifline.powerbasic"
-                },
-                "2": {
-                    "name": "keyword.control.if.powerbasic"
-                },
-                "3": {
-                    "patterns": [
-                        {
-                            "include": "#expression"
-                        }
-                    ]
-                },
-                "4": {
-                    "name": "keyword.control.then.powerbasic"
-                },
-                "5": {
-                    "patterns": [
-                        {
-                            "include": "#expression"
-                        }
-                    ]
-                },
-                "6": {
-                    "patterns": [
-                        {
-                            "include": "#comment_line"
-                        }
-                    ]
+                    "name": "keyword.control.begin.if.powerbasic"
                 }
             },
-            "end": "\\n"
-        },
-        "flow_control_if_contents": {
+            "end": "\\s+(?=\\bTHEN\\b|(?<!\\s_)\\n)",
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.then.if.powerbasic"
+				}
+			},
             "patterns": [
                 {
-                    "match": "\\s*\\b((ELSEIF))\\b\\s(.*)\\s\\b(THEN)(\\s\\'.*)?",
-                    "captures": {
-                        "1": {
-                            "name": "meta.keyword.control.ifblock.sub.powerbasic"
-                        },
-                        "2": {
-                            "name": "keyword.control.elseif.powerbasic"
-                        },
-                        "3": {
-                            "patterns": [
-                                {
-                                    "include": "#expression"
-                                }
-                            ]
-                        },
-                        "4": {
-                            "name": "keyword.control.then.powerbasic"
-                        },
-                        "5": {
-                            "patterns": [
-                                {
-                                    "include": "#comment_line"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "match": "((ELSE\\b))\\s*(.*)(\\s\\'.*)?",
-                    "captures": {
-                        "1": {
-                            "name": "meta.keyword.control.ifblock.powerbasic"
-                        },
-                        "2": {
-                            "name": "keyword.control.else.powerbasic"
-                        },
-                        "3": {
-                            "name": "invalid.illegal.expression.endif.powerbasic"
-                        },
-                        "4": {
-                            "patterns": [
-                                {
-                                    "include": "#comment_line"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "include": "#process_contents"
+                    "include": "#expression"
                 }
             ]
         },
@@ -1098,7 +1027,7 @@
 					}
 				},
 				{
-					"include": "#process_contents"
+					"include": "#block_contents_process"
 				}
 			]
 		},
@@ -1125,7 +1054,7 @@
 					"match": "^\\s*(FINALLY)\\b"
 				},
 				{
-					"include": "#process_contents"
+					"include": "#block_contents_process"
 				}
 			]
 		},
@@ -1152,7 +1081,7 @@
 			},
 			"patterns": [
 				{
-					"include": "#process_contents"
+					"include": "#block_contents_process"
 				}
 			]
 		},
@@ -1173,6 +1102,34 @@
             "name": "constant.numeric.powerbasic",
             "match": "\\b((&(b|B)[0-1]*)(&(h|H)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\\b"
         },
+		"objects": {
+			"name": "meta.object.powerbasic",
+			"match": "\\b(\\w+(?:\\(.*\\))?)(?:(\\.)\\b(\\w+(?:\\(.*\\))?))+",
+			"captures": {
+				"1": {
+					"name": "meta.member.top-level.object",
+					"patterns": [
+						{
+							"include": "#variable"
+						}
+					]
+				},
+				"2": {
+					"name": "support.seperator.object.powerbasic"
+				},
+				"3": {
+					"name": "meta.member.object",
+					"patterns": [
+						{
+							"include": "#variable"
+						},
+						{
+							"include": "#process_call"
+						}
+					]
+				}
+			}
+		},
         "operators": {
             "patterns": [
                 {
@@ -1192,47 +1149,469 @@
                 }
             ]
         },
-		"processes": {
-			"comment": "Include all process blocks: Function, Sub, etc.",
-			"patterns": [
+        "preprocessor": {
+            "patterns": [
                 {
-                    "name": "meta.process.function.powerbasic",
-                    "begin": "^\\s*(?=FUNCTION)",
-		            "end": "(END FUNCTION)",
-		            "endCaptures": {
-		                "1": {
-		                    "name": "keyword.control.function.end.powerbasic"
-		                }
-		            },
-		            "patterns": [
-		                {
-		                    "include": "#process_declaration_line_function"
-		                },
-		                {
-		                    "include": "#process_contents"
-		                }
-		            ]
+                    "include": "#preprocessor_if"
                 },
                 {
-                    "name": "meta.process.function.powerbasic",
-                    "begin": "^\\s*(?=SUB)",
-		            "end": "(END SUB)",
-		            "endCaptures": {
-		                "1": {
-		                    "name": "keyword.control.sub.end.powerbasic"
-		                }
-		            },
-		            "patterns": [
-		                {
-		                    "include": "#process_declaration_line_sub"
-		                },
-		                {
-		                    "include": "#process_contents"
-		                }
-		            ]
+                    "include": "#preprocessor_metastatements"
+                },
+				{
+					"include": "#declarations_outside_processes"
+				}
+            ]
+        },
+        "preprocessor_if": {
+            "patterns": [
+                {
+                    "include": "#preprocessor_if_block"
                 }
             ]
-		},
+        },
+        "preprocessor_if_start": {
+            "comment": "start preprocessor if statement",
+			"name": "meta.declare.line.if.powerbasic",
+            "begin": "^\\s*(#\\bIF\\b)",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.control.begin.if.powerbasic"
+                }
+            },
+            "end": "(?<!\\s_)\\n",
+            "patterns": [
+                {
+                    "include": "#preprocessor_if_expressions"
+                }
+            ]
+        },
+        "preprocessor_if_block": {
+            "name": "meta.if.block.preprocessor.powerbasic",
+			"begin": "(?=^\\s*#IF)",
+			"end": "(#ENDIF\\b)",
+            "endCaptures": {
+                "1": {
+                    "name": "keyword.control.endif.preprocessor.powerbasic"
+                }
+            },
+			"patterns": [
+				{
+					"include": "#preprocessor_if_start"
+				},
+				{
+					"include": "#preprocessor_if_contents"
+				}
+			]
+        },
+        "preprocessor_if_contents": {
+            "patterns": [
+                {
+                    "begin": "(#\\bELSEIF\\b)",
+                    "beginCaptures": {
+                        "1": {
+                            "name": "keyword.control.flow.elseif.preprocessor.powerbasic"
+                        }
+        			},
+					"end": "(?<!\\s_)\\n",
+					"endCaptures": {
+						"1": {
+							"name": "keyword.control.flow.then.powerbasic"
+						}
+					},
+                    "patterns": [
+                        {
+                            "include": "#preprocessor_if_contents"
+                        }
+                    ]
+                },
+                {
+                    "match": "(#\\bELSE\\b)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.control.flow.else.preprocessor.powerbasic"
+                        }
+                    }
+                },
+                {
+                    "include": "#block_contents_process"
+                },
+                {
+                    "include": "$base"
+                }
+            ]
+        },
+        "preprocessor_if_expressions": {
+			"patterns": [
+				{
+					"include": "#expression"
+				}
+			]
+        },
+        "preprocessor_metastatements": {
+            "patterns": [
+                {
+                    "name": "meta.align.metastatement.preprocessor.powerbasic",
+                    "match": "#(ALIGN)(\\s+[^\\s\\']+)?",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.align.compiler.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "name": "keyword.align.compiler.metastatement.preprocessor.powerbasic"
+                        },
+                        "3": {
+                            "patterns": [
+                                {
+                                    "name": "constant.numeric.boundary.align.metastatement.powerbasic",
+                                    "match": "\\b(4|8|16|32|64|128|256|2)\\b"
+                                },
+                                {
+                                    "name": "invalid.illegal.numeric.boundary.align.metastatement.powerbasic",
+                                    "match": "\\b(?!(4|8|16|32|64|128|256|2)).+\\b"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "match": "#(BLOAT)\\b(.*)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.bloat.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "name": "support.expression.bloat.metatstatement.preprocessor.powerbasic",
+                            "match": "\\(?(\\d+)\\s*(\\))?([\\+\\-\\*\\/\\^])(\\()?\\s*(\\d+)+",
+                            "captures": {
+                                "1": {
+                                    "patterns": [
+                                        {
+                                            "include": "#numbers"
+                                        }
+                                    ]
+                                },
+                                "2": {
+                                    "name": "punctuation.parantheses.open.powerbasic"
+                                },
+                                "3": {
+                                    "patterns": [
+                                        {
+                                            "include": "#operators"
+                                        }
+                                    ]
+                                },
+                                "4": {
+                                    "name": "punctuation.parantheses.open.powerbasic"
+                                },
+                                "5": {
+                                    "patterns": [
+                                        {
+                                            "include": "#numbers"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "match": "#(COMPILE)(\\s+[^\\s\\']+)?(?:\\s+(\".*\"))?",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.compile.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "patterns": [
+                                {
+                                    "name": "support.argument.compile.metastatement.preprocessor.powerbasic",
+                                    "match": "(EXE|SLL)"
+                                },
+                                {
+                                    "name": "invalid.keyword.compile.metastatement.preprocessor.powerbasic",
+                                    "match": "\\b(?!(EXE|SLL)).+\\b"
+                                }
+                            ]
+                        },
+                        "3": {
+                            "patterns": [
+                                {
+                                    "include": "#quoted_string"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "match": "#(COMPILER)(\\s+[^\\s\\']+)?\\s+(.*)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.compiler.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "patterns": [
+                                {
+                                    "name": "support.name.compiler.metatstatement.preprocessor.powerbasic",
+                                    "match": "(PBCC|PBWIN)"
+                                },
+                                {
+                                    "name": "invalid.keyword.name.compiler.metatstatement.preprocessor.powerbasic",
+                                    "match": "(?!(PBCC|PBWIN)).*"
+                                }
+                            ]
+                        },
+                        "3": {
+                            "include": "#numbers"
+                        }
+                    }
+                },
+                {
+                    "match": "#(OPTIMIZE)(\\s+[A-Z]{4,5}+\\s+[A-Z]{2,3}|[A-Z]+)?\\s+(.*)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.optimize.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "name": "support.argument.optimize.metatstatement.preprocessor.powerbasic",
+                            "match":"^(CODE ON|CODE OFF|CODE|SPEED|SIZE)$"
+                        },
+                        "3": {
+                            "name": "invalid.illegal.argument.optimize.metastatement.powerbasic"
+                        }
+                    }
+                },
+                {
+                    "match": "#(OPTION)(\\s+[^\\s\\']+)?\\s+(.*)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.option.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "patterns": [
+                                {
+                                    "name": "support.argument.option.metastatement.preprocessor.powerbasic",
+                                    "match": "(ANSIAPI|LARGEMEM32|VERSION3|VERSION4|VERSION5|WIN95)"
+                                },
+                                {
+                                    "name": "invalid.illegal.argument.option.metastatement.preprocessor.powerbasic",
+                                    "match": "(?!(ANSIAPI|LARGEMEM32|VERSION3|VERSION4|VERSION5|WIN95)).*"
+                                }
+                            ]
+                        },
+                        "3": {
+                            "name": "invalid.illegal.argument.option.metastatement.powerbasic"
+                        }
+                    }
+                },
+                {
+                    "match": "#(REGISTER)(\\s+[^\\s\\']+)?\\s+(.*)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.register.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "patterns": [
+                                {
+                                    "name": "support.argument.register.metastatement.preprocessor.powerbasic",
+                                    "match": "(ALL|DEFAULT|NONE)"
+                                },
+                                {
+                                    "name": "invalid.illegal.argument.register.metastatement.preprocessor.powerbasic",
+                                    "match": "(?!(ALL|DEFAULT|NONE))[^\\s\\']+"
+                                }
+                            ]
+                        },
+                        "3": {
+                            "name": "invalid.illegal.argument.register.metastatement.powerbasic"
+                        }
+                    }
+                },
+                {
+                    "match": "#(DIM)(\\s+[^\\s\\']+)?\\s+(.*)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.dim.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "patterns": [
+                                {
+                                    "name": "support.argument.dim.metastatement.preprocessor.powerbasic",
+                                    "match": "\\b(ALL|NONE)\\b"
+                                }
+                            ]
+                        },
+                        "3": {
+                            "name": "invalid.illegal.argument.dim.metastatement.powerbasic"
+                        }
+                    }
+                },
+                {
+                    "match": "#(UNIQUE)(\\s+[^\\s\\']+)?(\\s+[^\\s\\']+)?",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.unique.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "name": "support.argument.unique.metastatement.preprocessor.powerbasic",
+                            "match": "\\b(VAR)\\b"
+                        },
+                        "3": {
+                            "name": "support.state.argument.unique.metastatement.preprocessor.powerbasic",
+                            "match": "\\b(ON|OFF)\\b"
+                        },
+                        "4": {
+                            "name": "invalid.illegal.argument.unique.metastatement.powerbasic"
+                        }
+                    }
+                },
+                {
+                    "match": "#(UTILITY)(\\s+\"[^\\']*\")?",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.utility.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "include": "#quoted_string"
+                        }
+                    }
+                },
+                {
+                    "match": "#(BREAK)(?:\\s+(\\w+))?",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.break.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "name": "support.argument.break.metastatement.preprocessor.powerbasic",
+                            "match": "(ON|OFF)"
+                    	}
+                    }
+                },
+                {
+                    "match": "#(CONSOLE)(?:\\s+(\\w+))?",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.console.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "name": "support.argument.console.metastatement.preprocessor.powerbasic",
+                            "match": "(ON|OFF)"
+                        }
+                    }
+                },
+                {
+                    "match": "#(DEBUG)((?:\\s+[^\\s\\']+)+)?",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.debug.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "patterns": [
+                                {
+                                    "name": "support.argument.debug.metastatement.preprocessor.powerbasic",
+                                    "match": "\\b(CODE ON|CODE OFF|CODE|DISPLAY ON|DISPLAY|ERROR OFF|ERROR ON|ERROR)\\b"
+                                },
+                                {
+                                    "name": "support.argument.debug.metastatement.preprocessor.powerbasic",
+                                    "match": "\\b(PRINT)\\b(?:\\s+(\".*\"))?",
+                                    "captures": {
+                                        "1": {
+                                            "name": "support.print.debug.metastatement.preprocessor.powerbasic"
+                                        },
+                                        "2": {
+                                            "name": "support.string.print.debug.metastatement.preprocessor.powerbasic",
+                                            "patterns": [
+                                                {
+                                                    "include": "#quoted_string"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "match": "#(TOOLS)(?:\\s+([^\\s\\']+))?",
+                    "captures": {
+                        "2": {
+                            "name": "keyword.tools.metastatement.preprocessor.powerbasic"
+                        },
+                        "3": {
+                            "name": "support.argument.tools.metastatement.preprocessor.powerbasic",
+                            "match": "\\b(ON|OFF)\\b"
+                        }
+                    }
+                },
+                {
+                    "match": "#(PAGE)\\b((?:\\s+[^\\']+)+)?",
+                    "captures": {
+                        "1": {
+							"name": "keyword.page.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+                            "name": "invalid.illegal.argument.page.metastatement.powerbasic"
+                        }
+                    }
+                },
+                {
+                    "match": "#(INCLUDE)\\b(?:\\s+(\\bONCE\\b\\s+)?(\".*\")|\\s+(\\bTHIS\\b(?:\\s+ONCE\\b)?))?",
+                    "captures": {
+                        "1": {
+							"name": "keyword.include.metastatement.preprocessor.powerbasic"
+                        },
+                        "2": {
+							"name": "support.modifier.include.powerbasic"
+                        },
+						"3": {
+							"patterns": [
+								{
+									"include": "#quoted_string"
+								}
+							]
+						},
+						"4": {
+							"name": "support.modifier.include.powerbasic"
+						}
+                    }
+                },
+                {
+                    "name": "keyword.link.metastatement.preprocessor.powerbasic",
+                    "match": ""
+                },
+                {
+                    "name": "keyword.export.metastatement.preprocessor.powerbasic",
+                    "match": ""
+                },
+                {
+                    "match": "(#RESOURCE)\\b(?:\\s+(\\w+))?(?:\\s*,\\s*(\\w+))?(?:\\s*,\\s*(\".*\")(?:\\$\\$)?)?(?:\\s*,\\s*(\\w+))?",
+					"captures": {
+						"1": {
+							"name": "keyword.resource.metastatement.preprocessor.powerbasic"
+						},
+						"2": {
+							"name": "support.type.resource.preprocessor.powerbasic",
+							"match": "(BITMAP|ICON|MANIFEST|RCDATA|STRING|WAVE)"
+						},
+						"3": {
+							"name": "support.resid.resource.preprocessor.powerbasic",
+							"match": "\\b(\\d+|\\w+)"
+						},
+						"4": {
+							"patterns": [
+								{
+									"include": "#quoted_string"
+								}
+							]
+						},
+						"5": {
+							"name": "support.langid.resource.metastatement.preprocessor.powerbasic",
+							"match": "&H\\d{4}"
+						}
+					}
+                }
+            ]
+        },
         "process_alias": {
             "name": "meta.function.declaration.alias.powerbasic",
             "match": "(ALIAS)\\s+(\"\\w*\")",
@@ -1307,14 +1686,14 @@
                 },
                 {
                     "name": "keyword.parse.powerbasic",
-                    "match": "\\bPARSE\\b"
+                    "match": "\\bPARSE\\b(?:\\$)?"
                 },
                 {
                     "name": "keyword.shell.powerbasic",
                     "match": "\\bSHELL\\b"
                 },
 				{
-					"match": "\\b(UCODEPAGE)((?:\\s+(?!TO)\\S+)+)?(?:\\s+(TO))?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
+					"match": "\\b(UCODEPAGE)((?:\\s+(?!TO)[^\\s\\']+)+)?(?:\\s+(TO))?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.command.ucodepage.powerbasic"
@@ -1399,7 +1778,7 @@
 				},
 				{
 					"comment": "console pseudo-object, standard syntax",
-					"match": "\\s*\\b(CONSOLE|CON)\\b([\\.A-Z]+[%&!\\?\\$]?(?:\\(.*\\))?)(?:\\s+(TO))?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
+					"match": "\\s*\\b(CONSOLE|CON)\\b([\\.A-Z]+[#%&!\\?\\$]?(?:\\(.*\\))?)(?:\\s+(TO))?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.console.powerbasic"
@@ -1431,6 +1810,68 @@
 							]
 						}
 					}
+				},
+				{
+					"comment": "Play Wave Resource",
+					"match": "\\b(PLAY\\b(?:\\s+WAVE\\b)?)((?:\\s+(?!TO)[^\\s\\',]+)+)?(?:(?:\\s+,\\s*(Loop|NoStop|Synch|YieldMS\\(.*\\)))+)?(?:\\s+(TO)((?:\\s+[^\\s\\']+)+))?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.wave.play.powerbasic"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#process_call"
+								},
+								{
+									"include": "#variable"
+								},
+								{
+									"include": "#quoted_string"
+								},
+								{
+									"match": "(#)(\\d+)",
+									"captures": {
+										"1": {
+											"name": "support.marker.id.numeric.powerbasic"
+										},
+										"2": {
+											"name": "constant.numeric.powerbasic"
+										}
+									}
+								}
+							]
+						},
+						"3": {
+							"name": "support.descriptor.wave.play.powerbasic"
+						},
+						"4": {
+							"name": "support.assignment.success.powerbasic"
+						},
+						"5": {
+							"patterns": [
+								{
+									"include": "#variable"
+								}
+							]
+						}
+					}
+				},
+				{
+					"match": "\\b(SLEEP)\\b(?:\\s+(\\d+))?",
+					"captures": {
+						"1": {
+							"name": "keyword.control.waitkey.powerbasic"
+						},
+						"2": {
+							"name": "constant.numeric.powerbasic"
+						}
+					}
+				},
+				{
+					"comment": "Wait for Keyboard Input",
+					"name": "keyword.control.waitkey.powerbasic",
+					"match": "\\b(WAITKEY\\$)"
 				}
 			]
 		},
@@ -1516,24 +1957,32 @@
 		"process_built-ins_file-io": {
 			"patterns": [
 				{
-                    "name": "keyword.control.environ.powerbasic",
+                    "name": "keyword.control.fileattr.powerbasic",
                     "match": "\\b(FILEATTR)\\b"
                 },
+				{
+                    "name": "keyword.control.getattr.powerbasic",
+                    "match": "\\b(GETATTR)\\b"
+                },
+				{
+                    "name": "keyword.control.setattr.powerbasic",
+                    "match": "\\b(SETATTR)\\b"
+                },
                 {
-                    "name": "keyword.control.environ.powerbasic",
+                    "name": "keyword.control.filecopy.powerbasic",
                     "match": "\\b(FILECOPY)\\b"
                 },
                 {
-                    "name": "keyword.control.environ.powerbasic",
+                    "name": "keyword.control.filename.powerbasic",
                     "match": "\\b(FILENAME\\$)"
                 },
                 {
-                    "name": "keyword.control.environ.powerbasic",
+                    "name": "keyword.control.filescan.powerbasic",
                     "match": "\\b(FILESCAN)\\b"
                 },
 				{
 					"comment": "File Close",
-					"match": "\\b(CLOSE)\\b(?:\\s+(#.*))?",
+					"match": "\\b(CLOSE)\\b(?:\\s+(#[^\\s\\'](?:(?:\\s+[^\\s\\']+)+)?))?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.close.powerbasic"
@@ -1550,7 +1999,7 @@
 				},
 				{
 					"comment": "File Open",
-					"match": "\\b(OPEN HANDLE|OPEN)((?:\\s+(?!FOR|ACCESS|LOCK|AS)\\S+)+)?((?:\\s+(?:(?:FOR|ACCESS|LOCK|AS|LEN|BASE|CHR)(?:\\s+(?!FOR|ACCESS|LOCK|AS|LEN|BASE|CHR)[^\\s\\']+)*))*)?(?:\\s+(\\'.*))?",
+					"match": "\\b(OPEN HANDLE|OPEN)((?:\\s+(?!FOR|ACCESS|LOCK|AS)[^\\s\\']+)+)?((?:\\s+(?:\\b(?:FOR|ACCESS|LOCK|AS|LEN|BASE|CHR)\\b(?:\\s+(?!FOR|ACCESS|LOCK|AS|LEN|BASE|CHR)[^\\s\\']+)+))+)?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.open.powerbasic"
@@ -1567,6 +2016,7 @@
 							"name": "meta.options.open.powerbasic",
 							"patterns": [
 								{
+                                    "name": "meta.for.open.powerbasic",
 									"match": "\\b(FOR)(?:\\s+(INPUT|OUTPUT|APPEND|BINARY|RANDOM))?",
 									"captures": {
 										"1": {
@@ -1578,6 +2028,7 @@
 									}
 								},
 								{
+                                    "name": "meta.access.open.powerbasic",
 									"match": "\\b(ACCESS)(?:\\s+(READ WRITE|READ|WRITE))?",
 									"captures": {
 										"1": {
@@ -1589,6 +2040,7 @@
 									}
 								},
 								{
+                                    "name": "meta.lock.open.powerbasic",
 									"match": "\\b(LOCK)(?:\\s+(READ WRITE|READ|WRITE|SHARED))?",
 									"captures": {
 										"1": {
@@ -1600,7 +2052,8 @@
 									}
 								},
 								{
-									"match": "\\b(AS)(?:\\s+(#[^\\']+))?",
+                                    "name": "meta.as.open.powerbasic",
+									"match": "\\b(AS)(?:\\s+(#[^\\s\\']+))?",
 									"captures": {
 										"1": {
 											"name": "keyword.as.open.powerbasic"
@@ -1616,7 +2069,8 @@
 									}
 								},
 								{
-									"match": "\\b(LEN)(?:\\s+(=))?(?:\\s+(\\d+))?",
+                                    "name": "meta.len.open.powerbasic",
+									"match": "\\b(LEN)\\b(?:\\s+(=))?((?:\\s+[^\\s\\']+)+)?",
 									"captures": {
 										"1": {
 											"name": "keyword.len.open.powerbasic"
@@ -1628,6 +2082,12 @@
 											"name": "support.mode.len.open.powerbasic",
 											"patterns": [
 												{
+													"include": "#variable"
+												},
+												{
+													"include": "#process_call"
+												},
+												{
 													"include": "#numbers"
 												}
 											]
@@ -1635,6 +2095,7 @@
 									}
 								},
 								{
+                                    "name": "meta.base.open.powerbasic",
 									"match": "\\b(BASE)(?:\\s+(=))?(?:\\s+(0|1))?",
 									"captures": {
 										"1": {
@@ -1653,6 +2114,7 @@
 									}
 								},
 								{
+                                    "name": "meta.chr.open.powerbasic",
 									"match": "\\b(CHR)(?:\\s+(ANSI|WIDE))?",
 									"captures": {
 										"1": {
@@ -1664,19 +2126,12 @@
 									}
 								}
 							]
-						},
-						"4": {
-							"patterns": [
-								{
-									"include": "#comment_line"
-								}
-							]
 						}
 					}
 				},
 				{
 					"comment": "File read/write operations",
-					"match": "\\s*(PRINT|WRITE|LINE INPUT|INPUT)(?:\\s+(#.*),)?((?:\\s+[^\\s\\']+)+)?(?:\\s+(\\'.*))?",
+					"match": "\\s*(PRINT|WRITE|LINE INPUT|INPUT)(?:\\s+(#[^\\s\\'](?:(?:\\s+[^\\s\\']+)+)?),)?((?:\\s+[^\\s\\']+)+)?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.print.powerbasic"
@@ -1723,10 +2178,6 @@
                     "match": "\\bFREEFILE\\b"
                 },
                 {
-                    "name": "keyword.isfile.powerbasic",
-                    "match": "\\bISFILE\\b"
-                },
-                {
                     "name": "keyword.kill.powerbasic",
                     "match": "\\bKILL\\b"
                 }
@@ -1755,7 +2206,11 @@
 			"patterns": [
 				{
 					"name": "keyword.control.environ.powerbasic",
-					"match": "\\b(ENVIRON\\$?)\\b"
+					"match": "\\b(ENVIRON\\$?)"
+				},
+				{
+					"name": "keyword.control.funcname.powerbasic",
+					"match": "\\b(FUNCNAME\\$)"
 				},
 				{
 					"name": "keyword.parameter.powerbasic",
@@ -1766,21 +2221,8 @@
 		"process_call": {
 			"patterns": [
 				{
-					"match": "(?<=[\\s\\(,;=])(\\b[A-Z]\\w*\\b[%&!\\?\\$]*)(?=[^\\(])",
-					"captures": {
-						"1": {
-							"name": "meta.call.without_arguments.process.powerbasic",
-							"patterns": [
-								{
-									"include": "#process_names"
-								}
-							]
-						}
-					}
-				},
-				{
 		            "name": "meta.call.with_arguments.process.powerbasic",
-		            "begin": "(\\b[A-Z]\\w*\\b[%&!\\?\\$]*)(\\()",
+		            "begin": "(\\b[A-Z]\\w*(?:%|&&|&|\\?\\?\\?|\\?\\?|\\?|!|##|#|@@|@|\\$\\$|\\$)?)(\\()",
 		            "beginCaptures": {
 		                "1": {
 		                    "patterns": [
@@ -1797,7 +2239,7 @@
 		                    ]
 		                }
 		            },
-		            "end": "(\\)|(?<!_)\\n)",
+		            "end": "(\\)|(?<! _)\\n)",
 		            "endCaptures": {
 		                "1": {
 		                    "patterns": [
@@ -1812,109 +2254,19 @@
 		                    "include": "#process_arguments"
 		                }
 		            ]
-				}
-			]
-        },
-        "process_contents": {
-            "patterns": [
-                {
-                    "include": "#comment_block"
-                },
-                {
-                    "include": "#comment_line"
-                },
-                {
-                    "include": "#labels"
-                },
-                {
-                    "include": "#flow_control"
-                },
-                {
-                    "include": "#variable_declaration"
-                },
-                {
-                    "include": "#expression"
-                }
-            ]
-        },
-        "process_declaration_line_function": {
-            "begin": "^\\s*(FUNCTION)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\())",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control.function.declare.powerbasic"
-                },
-                "2": {
-                    "patterns": [
-                        {
-                            "include": "#process_names_function"
-                        }
-                    ]
-                },
-                "3": {
-                    "patterns": [
-                        {
-                            "include": "#process_alias"
-                        }
-                    ]
-                }
-            },
-			"end": "(?:(\\))(?:\\s+(?!AS)(\\S+))?(?:\\s+(AS\\s+\\S+))?|(?<!_)\\n)",
-			"endCaptures": {
-				"2": {
-                    "patterns": [
-                        {
-                            "include": "#process_descriptor"
-                        }
-                    ]
-                },
-                "3": {
-                    "patterns": [
-                        {
-                            "include": "#variable_type_specifier"
-                        }
-                    ]
-                }
-			},
-			"patterns": [
+				},
 				{
-					"include": "#process_arguments"
-				}
-			]
-        },
-        "process_declaration_line_sub": {
-            "begin": "^\\s*(SUB)(?:\\s+([^\\s\\(]+))?(?:\\s+(ALIAS\\s+\"\\w*\")\\s)?(?:\\s*(\\())?",
-            "beginCaptures": {
-                "1": {
-                    "name": "keyword.control.sub.declare.powerbasic"
-                },
-                "2": {
-                    "patterns": [
-                        {
-                            "include": "#process_names_function"
-                        }
-                    ]
-                },
-                "3": {
-                    "patterns": [
-                        {
-                            "include": "#process_alias"
-                        }
-                    ]
-                }
-            },
-            "end": "(?:(\\))(?:\\s+(?!AS)(\\S+))?|(?<!_)\\n)",
-			"endCaptures": {
-				"2": {
-                    "patterns": [
-                        {
-                            "include": "#process_descriptor"
-                        }
-                    ]
-                }
-			},
-			"patterns": [
-				{
-					"include": "#process_arguments"
+					"match": "(?<=[\\s\\.\\(,;=])(\\b[A-Z]\\w*(?:%|&&|&|\\?\\?\\?|\\?\\?|\\?|!|##|#|@@|@|\\$\\$|\\$)?)(?!\\()",
+					"captures": {
+						"1": {
+							"name": "meta.call.without_arguments.process.powerbasic",
+							"patterns": [
+								{
+									"include": "#process_names"
+								}
+							]
+						}
+					}
 				}
 			]
         },
@@ -1923,8 +2275,12 @@
             "match": "(EXPORT|COMMON|PRIVATE|THREADSAFE|LOCAL|STATIC|BDECL|CDECL|SDECL|THREAD)"
         },
         "process_names": {
-            "name": "entity.name.process.powerbasic",
-            "match": "\\b([A-Z]\\w*[%&!\\?\\$]*)"
+			"patterns": [
+				{
+		            "name": "entity.name.process.powerbasic",
+		            "match": "\\b([A-Z]\\w*[#%&!\\?\\$]*)"
+				}
+			]
         },
         "process_names_sub": {
             "patterns": [
@@ -1935,7 +2291,7 @@
                 {
                     "comment": "Can't assign variable type on SUB, use FUNCTION instead",
                     "name": "invalid.specifier.type.variable.sub.powerbasic",
-                    "match": "\\w+[%&!\\?\\$]*"
+                    "match": "\\w+[#%&!\\?\\$]*"
                 }
             ]
         },
@@ -1943,7 +2299,7 @@
             "patterns": [
                 {
                     "name": "entity.name.process.user-defined.powerbasic",
-                    "match": "[A-Z][A-za-z0-9_]*[%&!\\?\\$]*"
+                    "match": "[A-Z][A-za-z0-9_]*[#%&!\\?\\$]*"
                 }
             ]
         },
@@ -1979,44 +2335,24 @@
             }
         },
 		"statement": {
+			"begin": "(^|:)",
+			"end": "((?<!\"):(?!\")|\\s\\`|$)",
 			"patterns": [
 				{
-					"comment": "Process call, including built-ins (PRINT, COLOR, etc)",
-					"patterns": [
-						{
-							"include": "#process_built-ins"
-						}
-					]
-				},
-				{
-					"comment": "",
-					"name": "",
-					"match": "",
-					"patterns": [
-						{
-						}
-					]
-				},
-				{
-					"comment": "",
-					"name": "",
-					"match": "",
-					"patterns": [
-						{
-						}
-					]
+					"include": "#expression"
 				}
 			]
 		},
         "variable": {
             "patterns": [
                 {
-                    "begin": "\\b([a-z]\\w*[%&!\\?\\$]*)(\\()",
+					"name": "meta.variable.powerbasic",
+                    "begin": "\\b([a-z]\\w*[#%&!\\?\\$]*)(\\()",
                     "beginCaptures": {
                         "1": {
 							"patterns": [
 								{
-		                            "include": "#variable_type"
+		                            "include": "#variable_name"
 								}
 							]
                         },
@@ -2024,7 +2360,7 @@
                             "name": "punctuation.begin.array.variable.powerbasic"
                         }
                     },
-                    "end": "(\\))(?:\\s+(AS\\s+\\S+))?",
+                    "end": "(\\))(?:\\s+(AS(?:\\s+[A-Z]\\w*)+(?:\\s+\\*\\s+\\d+)?))?",
                     "endCaptures": {
                         "1": {
                             "name": "punctuation.end.array.variable.powerbasic"
@@ -2054,12 +2390,12 @@
                     ]
                 },
                 {
-                    "match": "\\b([a-z]\\w*[%&!\\?\\$]*)(?:\\s+(AS\\s+\\S+))?",
+                    "match": "\\b([a-z]\\w*[#%&!\\?\\$]*)(?:\\s+(AS(?:\\s+[A-Z]\\w*)+(?:\\s+\\*\\s+\\d+)?))?",
                     "captures": {
                         "1": {
 							"patterns": [
 								{
-		                            "include": "#variable_type"
+		                            "include": "#variable_name"
 								}
 							]
                         },
@@ -2097,7 +2433,7 @@
 			"patterns": [
 				{
 					"comment": "variable declaration",
-					"match": "^\\s*(LOCAL|STATIC|INSTANCE|THREADED|GLOBAL)((?:\\s+[^\\s\\']+)+)(?:\\s+(\\'.*))?",
+					"match": "^\\s*(LOCAL|STATIC|INSTANCE|THREADED|GLOBAL)((?:\\s+[^\\s\\']+)+)?",
 					"captures": {
 						"1": {
 							"name": "keyword.declaration.scope.powerbasic"
@@ -2108,19 +2444,12 @@
 									"include": "#variable"
 								}
 							]
-						},
-						"3": {
-							"patterns": [
-								{
-									"include": "#comment_line"
-								}
-							]
 						}
 					}
 				},
 				{
 					"comment": "variable dimension",
-					"match": "^\\s*(DIM)((?:\\s+[^\\s\\']+)+)?(?:\\s+(AS(?:\\s+[A-Z]+)?(?:\\s+[A-Z]+)?))?(?:\\s+(\\'.*))?",
+					"match": "^\\s*(DIM)((?:\\s+[^\\s\\']+)+)?",
 					"captures": {
 						"1": {
 							"name": "keyword.control.dimension.variable.powerbasic"
@@ -2131,25 +2460,72 @@
 									"include": "#variable"
 								}
 							]
-						},
-						"2": {
-							"patterns": [
-								{
-									"include": "#variable_type_specifier"
-								}
-							]
-						},
-						"3": {
-							"patterns": [
-								{
-									"include": "#comment_line"
-								}
-							]
 						}
 					}
 				}
 			]
 		},
+        "variable_name": {
+			"name": "variable.powerbasic",
+            "patterns": [
+                {
+                    "name": "variable.integer.powerbasic",
+                    "match": "\\w+%"
+                },
+                {
+                    "name": "variable.integer.long.powerbasic",
+                    "match": "\\w+&"
+                },
+                {
+                    "name": "variable.integer.quad.powerbasic",
+                    "match": "\\w+&&"
+                },
+                {
+                    "name": "variable.byte.powerbasic",
+                    "match": "\\w+\\?"
+                },
+                {
+                    "name": "variable.word.powerbasic",
+                    "match": "\\w+\\?\\?"
+                },
+                {
+                    "name": "variable.word.double.powerbasic",
+                    "match": "\\w+\\?\\?\\?"
+                },
+                {
+                    "name": "variable.float.single.powerbasic",
+                    "match": "\\w+!"
+                },
+                {
+                    "name": "variable.float.double.powerbasic",
+                    "match": "\\w+#"
+                },
+                {
+                    "name": "variable.float.extended.powerbasic",
+                    "match": "\\w+##"
+                },
+                {
+                    "name": "variable.currency.powerbasic",
+                    "match": "\\w+@"
+                },
+                {
+                    "name": "variable.currency.extended.powerbasic",
+                    "match": "\\w+@@"
+                },
+                {
+                    "name": "variable.stringy.powerbasic",
+                    "match": "\\w+\\$"
+                },
+                {
+                    "name": "variable.string.wide.powerbasic",
+                    "match": "\\w+\\$\\$"
+                },
+				{
+					"name": "variable.unspecified.powerbasic",
+					"match": "\\w+"
+				}
+            ]
+        },
         "variable_punctuation": {
             "patterns": [
                 {
@@ -2166,81 +2542,29 @@
                 }
             ]
         },
-        "variable_type": {
-			"name": "variable.powerbasic",
-            "patterns": [
-                {
-                    "name": "variable.integer.type.powerbasic",
-                    "match": "\\w+%"
-                },
-                {
-                    "name": "variable.integer.long.type.powerbasic",
-                    "match": "\\w+&"
-                },
-                {
-                    "name": "variable.integer.quad.type.powerbasic",
-                    "match": "\\w+&&"
-                },
-                {
-                    "name": "variable.byte.type.powerbasic",
-                    "match": "\\w+\\?"
-                },
-                {
-                    "name": "variable.word.powerbasic.type",
-                    "match": "\\w+\\?\\?"
-                },
-                {
-                    "name": "variable.word.double.type.powerbasic",
-                    "match": "\\w+\\?\\?\\?"
-                },
-                {
-                    "name": "variable.float.single.type.powerbasic",
-                    "match": "\\w+!"
-                },
-                {
-                    "name": "variable.float.double.type.powerbasic",
-                    "match": "\\w+#"
-                },
-                {
-                    "name": "variable.float.extended.type.powerbasic",
-                    "match": "\\w+##"
-                },
-                {
-                    "name": "variable.currency.type.powerbasic",
-                    "match": "\\w+@"
-                },
-                {
-                    "name": "variable.currency.extended.type.powerbasic",
-                    "match": "\\w+@@"
-                },
-                {
-                    "name": "variable.stringy.type.powerbasic",
-                    "match": "\\w+\\$"
-                },
-                {
-                    "name": "variable.string.wide.type.powerbasic",
-                    "match": "\\w+\\$\\$"
-                },
-				{
-					"name": "variable.unspecified.type.powerbasic",
-					"match": "\\w+"
-				}
-            ]
-        },
         "variable_type_specifier": {
-            "match": "(AS)(?:\\s+([A-Z]+))?(?:\\s+([A-Z]+))?",
+            "match": "(AS)(?:\\s+\\b(LOCAL|STATIC|INSTANCE|THREADED|GLOBAL)\\b)?(?:\\s+([A-Z]\\w*))?(?:\\s+(\\*)((?:\\s+[^\\s\\']+)+))?",
             "captures": {
                 "1": {
                     "name": "support.identifier.type.variable.powerbasic"
                 },
                 "2": {
-                    "name": "keyword.declaration.scope.powerbasic",
-                    "match": "\\b(LOCAL|STATIC|INSTANCE|THREADED|GLOBAL)\\b"
+                    "name": "keyword.declaration.scope.powerbasic"
                 },
                 "3": {
-                    "name": "support.variable.type.specifier",
+                    "name": "keyword.control.type.dimension.powerbasic",
                     "match": "\\b(PTR|POINTER|INTEGER|LONG|QUAD|BYTE|WORD|DWORD|SINGLE|DOUBLE|EXT|EXTENDED|CUR|CURRENCY|CUX|CURRENCYX|STRING|ASCIIZ|STRINGZ|FIELD|WSTRING|WSTRINGZ|WFIELD|VARIANT|GUID|IAUTOMATION|IDISPATCH|IUNKNOWN)\\b"
-                }
+                },
+				"4": {
+					"name": "support.assignment.length.dimension.powerbasic"
+				},
+				"5": {
+					"patterns": [
+						{
+							"include": "#expression"
+						}
+					]
+				}
             }
         }
     }
